@@ -1,0 +1,8 @@
+build/
+dist/
+pynut.egg-info/
+__pycache__/
+*.exe
+*.pyc
+setup.py
+TutoToPublish.txt
