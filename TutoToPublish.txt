@@ -1,0 +1,12 @@
+https://realpython.com/pypi-publish-python-package/
+
+# Build the package
+	delete the DIST folder in C:\Users\laurent.tupin\Documents\GitHub\pynut
+- open CMD and type:
+python setup.py sdist bdist_wheel
+
+# Check if it passing
+twine check dist/*
+
+# UPLOAD
+twine upload dist/*
