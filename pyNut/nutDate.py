@@ -24,13 +24,13 @@ def fDte_Now():
 # Date Difference
 #------------------------------------------------------------------------------
 def fBl_TimeIsBetween(tm_start, tm_end, tm_toTest):
-    '''function that compares the given time against opening and closing
-    '''
+    """ fBl_TimeIsBetween let you know if a certain datetime is well between 2 others datetime """
     if tm_start <= tm_end:  bl_result = tm_start <= tm_toTest <= tm_end
     else:                   bl_result = tm_start <= tm_toTest or tm_toTest <= tm_end
     return bl_result
 
 def fInt_dateDifference(dte_bigger, dte_lower):
+    """ fInt_dateDifference give you the difference in days between 2 dates"""
     try:
         dte_bigger =    fDte_formatToDate(dte_bigger)
         dte_lower =     fDte_formatToDate(dte_lower)
@@ -59,6 +59,9 @@ def fStr_DateToString(dte_date, str_dateFormat = '%Y-%m-%d'):
     return str_date
 
 def fDte_formatToDate(dte_date, str_dateFormat = '%Y-%m-%d', bl_stopLoop = False):
+    """ fDte_formatToDate makes sure you will have a varable with a date format
+    The first Argument is the Variable (date), and the format of the string if it is a sting
+    It allows you to avoid testing the type of the variable and get your get Date anyhow"""
     try:
         if type(dte_date) == str:
             dte_date = dt.datetime.strptime(dte_date, str_dateFormat)
@@ -93,6 +96,9 @@ def fDte_formatToTimeStamp(dte_date):
     return dte_formatToDate
 
 def fDte_convertExcelInteger(int_dateEexcel, bl_formatDate_tuple = False):
+    """ fDte_convertExcelInteger takes an integer as input,
+    This is the integer you can find in Excel when it is a date
+    And return the associated date  """
     try:
         dte_base1900 = dt.datetime(1900, 1, 1)
         dte_excel = dte_base1900.toordinal() + int_dateEexcel - 2

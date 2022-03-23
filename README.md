@@ -34,7 +34,6 @@ This is the libraries I am using with the package
     >>> paramiko==2.6.0
     >>> psutil==5.9.0
     >>> pyodbc==4.0.32
-    >>> PyQt5==5.15.1
     >>> pywin32==303
     >>> selenium==3.141.0
     >>> xlrd==1.2.0
@@ -54,3 +53,26 @@ To use nutAPI / Selenium Functionnalities:
 
     
 
+
+## Documentation
+
+Temporary documentation for nutDate :
+
+    from pyNut import nutDate
+    
+    dte_date = dat.fDte_formatToDate(dte_date, str_dateFormat = '%d/%m/%Y')
+    """ fDte_formatToDate makes sure you will have a varable with a date format
+    The first Argument is the Variable (date), and the format of the string if it is a sting
+    It allows you to avoid testing the type of the variable and get your get Date anyhow"""
+    
+    int_dateDiff = dat.fInt_dateDifference(dte_date1, dte_date2)
+    """ fInt_dateDifference give you the difference in days between 2 dates"""
+    
+    Date2 = dat.fDte_convertExcelInteger(Date)
+    """ fDte_convertExcelInteger takes an integer as input, 
+    This is the integer you can find in Excel when it is a date 
+    And return the associated date  """
+    
+    
+
+xxxx
