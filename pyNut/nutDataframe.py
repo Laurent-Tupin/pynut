@@ -21,6 +21,10 @@ def fDf_createSimpleDataframe(l_column = None, l_values = None):
     df_data = pd.DataFrame(l_values, columns = l_column)
     return df_data
 
+def fDf_dataframe_fromSeries(d_series):
+    df_df = pd.DataFrame(d_series)
+    return df_df
+
 
 
 #==============================================================================

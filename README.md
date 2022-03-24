@@ -58,7 +58,7 @@ To use nutAPI / Selenium Functionnalities:
 
 Temporary documentation for nutDate :
 
-    from pyNut import nutDate
+    from pyNut import nutDate as dat
     
     dte_date = dat.fDte_formatToDate(dte_date, str_dateFormat = '%d/%m/%Y')
     """ fDte_formatToDate makes sure you will have a varable with a date format
@@ -75,4 +75,20 @@ Temporary documentation for nutDate :
     
     
 
-xxxx
+Temporary documentation for nutFiles :
+
+    from pyNut import nutFiles as fl
+    
+    l_fileList_consti = fl.fL_listFile(str_path_consti)
+    "" fL_listFile is listing all files in a folder using the library glob """
+    
+    o_file = fl.fO_readfile_parquet(str_path)
+    """ fO_readfile_parquet reads parquet - require the libraries : pyarrow / fastparquet"""
+    
+    
+    
+___END______________________
+
+
+
+

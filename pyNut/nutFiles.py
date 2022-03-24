@@ -49,8 +49,16 @@ def fStr_GetFileFromPath(str_path):
     str_fileName = str(str_path.split('\\')[-1])
     return str_fileName
 
+def fStr_myFileName():
+    return os.path.basename(__file__)
+
 def fStr_myPath():
     return os.path.dirname(os.path.abspath(__file__))
+
+def fL_listFile(str_path):
+    """ fL_listFile is listing all files in a folder using the library glob """
+    l_fileList = glob.glob(os.path.join(str_path, '*'))
+    return l_fileList
 
 def fStr_BuildPath(str_folder, str_FileName):
     if str_FileName == '':      str_path = str_folder
@@ -211,6 +219,7 @@ def fL_GetFileListInFolder(str_folder, str_fileName_withX, bl_searchOnlyIfPossib
         for file in [glob.glob(str_folder + str_fileName)]:
             if len(file) > 0:
                 L_files = glob.glob(str_folder + str_fileName)
+                # L_files = fL_listFile(os.path.join(str_folder, str_fileName))
                 #++++++++++++++++++++++++++++++++++++++++++++++++++++
                 return L_files
                 #++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -421,8 +430,13 @@ def fStr_CreateTxtFile(str_folder, str_FileName, df_data, str_sep = '', bl_heade
 #-----------------------------------------------------------------
 # READ
 #-----------------------------------------------------------------
+def fO_readfile_parquet(str_path):
+    """ fO_readfile_parquet reads parquet - require the libraries : pyarrow / fastparquet"""
+    o_file = pd.read_parquet(str_path)
+    return o_file
+
 def fStr_ReadFile_sql(str_filePath):
-    # Open and read the file as a single buffer
+    """ fStr_ReadFile_sql Opens and read the file as a single buffer"""
     file =  open(str_filePath, 'r')
     str_Content = file.read()
     file.close()
