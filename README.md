@@ -89,6 +89,27 @@ Temporary documentation for nutDataframe :
                                                       {'df': df_2,'colJoin': 'colJoin','colToCompare':'data'})
     """ compare 2 dataframe one a numeric column by joining the df and returning the difference """
     
+    df_1['DataRounded'] = df_1['DataToBeRounded'].apply(lambda x: dframe.round_down(x))
+    """ Use the Math Function floor() - Able to add a decimals like in Excel
+    floor() rounds down. int() truncates. 
+    The difference is clear when you use negative numbers
+    math.floor(-3.5)    -4
+    int(-3.5)           -3"""
+    
+    df_2['DataRounded'] = df_2['DataToBeRounded'].apply(lambda x: dframe.round_up(x))
+    """ Use the Math Function ceil() - Able to add a decimals like in Excel"""
+    
+    df_data = dframe.fDf_readCsv_enhanced(path, bl_header = None, str_sep = '|', l_names = range(33))
+    """ Use the pandas method read_csv
+     but resolving Parse Error and will try again after displaying a message 
+     Also resolving UnicodeDecodeError by detecting the encoding and trying again accordingly """
+     
+     df2 = dframe.fDf_removeDoublons(df1)
+     """ Remove all rows that are exactly the same"""
+     
+     df2 = dframe.fDf_DropRowsIfNa_resetIndex(df1, l_colToDropNA = ['col1'])
+     """ Drop the rows where all defined columns will be Nan
+    And reset the index"""
     
     
     

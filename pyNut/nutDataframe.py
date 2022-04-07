@@ -112,6 +112,8 @@ def round_myRound(nb_in, base = 1):
 # Nan
 #==============================================================================
 def fBl_IsNan(inputValue):
+    """ Test if a value is Nan 
+    Mainly from Dataframe and used with apply / lambda"""
     if isinstance(inputValue, float):
         if np.isnan(inputValue):
             return True
@@ -168,6 +170,7 @@ def fDf_readCsv_enhanced(str_path, bl_header = None, str_sep = ',', l_names = No
 # Operation on Dataframe
 #==============================================================================
 def fDf_removeDoublons(df_in):
+    """ Remove all rows that are exactly the same"""
     df = df_in.copy()
     df.drop_duplicates(subset = None, keep = 'first', inplace = True)
     return df

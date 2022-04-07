@@ -1,7 +1,5 @@
-import sys
 import datetime
 import time
-sys.path.append('../')
 import pyNut.nutDate as dat
 #import pytest
 
