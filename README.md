@@ -75,6 +75,25 @@ Temporary documentation for nutDate :
     
     
 
+Temporary documentation for nutDataframe :
+
+    import pyNut.nutDataframe as dframe
+    
+    bl_isempty = dframe.fBl_isDataframeEmpty(df_simple)
+    """ Test if a Dataframe is empty"""
+    
+    df_simple = dframe.fDf_createSimpleDataframe()
+    """ Create a simple dataframe to make test"""
+    
+    bl_compare, df_compare = dframe.fBl_compareDfCol({'df': df_1, 'colJoin': 'colJoin','colToCompare':'data'},
+                                                      {'df': df_2,'colJoin': 'colJoin','colToCompare':'data'})
+    """ compare 2 dataframe one a numeric column by joining the df and returning the difference """
+    
+    
+    
+    
+    
+
 Temporary documentation for nutFiles :
 
     from pyNut import nutFiles as fl

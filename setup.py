@@ -25,7 +25,7 @@ setup(
     packages = find_packages(exclude = ("test",)),
     include_package_data = True,
     install_requires = ["pandas==1.1.3", "paramiko==2.6.0", "beautifulsoup4==4.7.1", "exchangelib==4.7.2",
-                        "openpyxl==3.0.5","psutil==5.9.0", "pyodbc==4.0.32", "pywin32==303", "selenium==3.141.0",
+                        "openpyxl==3.0.5","psutil==5.9.0", "pyodbc==4.0.32", "pywin32", "selenium==3.141.0",
                         "xlrd==1.2.0", "XlsxWriter==1.3.5", "xlwings==0.20.8", "pyarrow", "fastparquet"]
     #entry_points={"console_scripts": ["EXEnameFile=FolderName.__main__:main"]},
 )

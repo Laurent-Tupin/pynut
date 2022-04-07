@@ -13,9 +13,11 @@ np  = lib.numpy()
 # Create Dataframe
 #==============================================================================
 def fBl_isDataframeEmpty(df):
+    """ Test if a Dataframe is empty"""
     return df.empty
 
 def fDf_createSimpleDataframe(l_column = None, l_values = None):
+    """ Create a simple dataframe to make test"""
     if l_column == None:    l_column = ['Empty_Dataframe']
     if l_values == None:    l_values = [0]
     df_data = pd.DataFrame(l_values, columns = l_column)
@@ -25,6 +27,31 @@ def fDf_dataframe_fromSeries(d_series):
     df_df = pd.DataFrame(d_series)
     return df_df
 
+
+#-------------------------------------------
+# Compare DF (only a column)
+#-------------------------------------------
+def fBl_compareDfCol(d_1, d_2, str_how = 'inner'):
+    """ compare 2 dataframe one a numeric column by joining the df and returning the difference """
+    # Param
+    df1 =           d_1['df']
+    str_colJoin1 =  d_1['colJoin']
+    str_col1 =      d_1['colToCompare']
+    df2 =           d_2['df']
+    str_colJoin2 =  d_2['colJoin']
+    str_col2 =      d_2['colToCompare']
+    # Join the df
+    df = df2[[str_colJoin2, str_col2]].copy()
+    if str_colJoin1 != str_colJoin2:
+        df[str_colJoin1] = df[str_colJoin2]
+    df = fDf_JoinDf(df1, df, str_colJoin1, str_how)
+    # Compare, make the difference
+    df['col1-col2'] = (df[str_col1] - df[str_col2]) #.apply(lambda x: round_corectPythonFlaws(x))
+    # Prepare the case its not numbers to compare
+    df_compare = df.loc[df['col1-col2'] != 0, [str_colJoin1, str_col1, str_col2,'col1-col2']]
+    int_nbRowDiff = len(df_compare)
+    if int_nbRowDiff == 0:  return True, None
+    else:                   return False, df_compare
 
 
 #==============================================================================
@@ -530,30 +557,6 @@ def fDf_JoinDf(df_left, df_right, str_columnON, str_how = 'inner', str_columnRig
         return df_left
     return df
 
-
-#-------------------------------------------
-# Compare DF (only a column) (done for WT)
-#-------------------------------------------
-def fBl_compareDfCol(d_1, d_2, str_how = 'inner'):
-    # Param
-    df1 =           d_1['df']
-    str_colJoin1 =  d_1['colJoin']
-    str_col1 =      d_1['colToCompare']
-    df2 =           d_2['df']
-    str_colJoin2 =  d_2['colJoin']
-    str_col2 =      d_2['colToCompare']
-    # Join the df
-    df = df2[[str_colJoin2, str_col2]].copy()
-    if str_colJoin1 != str_colJoin2:
-        df[str_colJoin1] = df[str_colJoin2]
-    df = fDf_JoinDf(df1, df, str_colJoin1, str_how)
-    # Compare, make the difference
-    df['col1-col2'] = (df[str_col1] - df[str_col2]).apply(round_corectPythonFlaws)
-    # Prepare the case its not numbers to compare
-    df_compare = df.loc[df['col1-col2'] != 0, [str_colJoin1, str_col1, str_col2,'col1-col2']]
-    int_nbRowDiff = len(df_compare)
-    if int_nbRowDiff == 0:  return True, None
-    else:                   return False, df_compare
 
 
 def fDf_imposerStr_0apVirgule(df, str_colName, int_0apVirgule = 2):

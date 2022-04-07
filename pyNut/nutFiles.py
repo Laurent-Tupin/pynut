@@ -35,6 +35,11 @@ fDte_datePast = dat.fDte_datePast
 #------------------------------------------------------------------------------
 # List Files in folder
 #------------------------------------------------------------------------------
+def fL_listFile(str_path):
+    """ fL_listFile is listing all files in a folder using the library glob """
+    l_fileList = glob.glob(os.path.join(str_path, '*'))
+    return l_fileList
+
 def fStr_GetEnvUserName():
     return os.environ['USERPROFILE']
 def fStr_GetUserEmail(str_emailExtension = '@gmail.com'):
@@ -53,12 +58,8 @@ def fStr_myFileName():
     return os.path.basename(__file__)
 
 def fStr_myPath():
+    #os.getcwd()
     return os.path.dirname(os.path.abspath(__file__))
-
-def fL_listFile(str_path):
-    """ fL_listFile is listing all files in a folder using the library glob """
-    l_fileList = glob.glob(os.path.join(str_path, '*'))
-    return l_fileList
 
 def fStr_BuildPath(str_folder, str_FileName):
     if str_FileName == '':      str_path = str_folder
@@ -134,6 +135,17 @@ def UpdateTxtFile(str_path, str_old, str_new = ''):
     # Write the file out again
     with open(str_path, 'w') as file:
         file.write(str_text)
+
+def TrimTxtFile(str_path, bl_right = False, bl_left = False):
+    with open(str_path, 'r') as file :
+        str_lines = file.readlines()
+    # remove spaces    
+    if bl_right is True:    str_lines = [line.rstrip() + '\n' for line in str_lines]
+    elif bl_left is True:   str_lines = [line.lstrip() + '\n' for line in str_lines]
+    else:                   str_lines = [line.strip() + '\n' for line in str_lines]
+    # Write the file out again
+    with open(str_path, 'w') as file:
+        file.writelines(str_lines)
 
 
 #------------------------------------------------------------------------------
@@ -430,9 +442,10 @@ def fStr_CreateTxtFile(str_folder, str_FileName, df_data, str_sep = '', bl_heade
 #-----------------------------------------------------------------
 # READ
 #-----------------------------------------------------------------
-def fO_readfile_parquet(str_path):
-    """ fO_readfile_parquet reads parquet - require the libraries : pyarrow / fastparquet"""
-    o_file = pd.read_parquet(str_path)
+def fO_readfile_parquet(str_path, **d_options):
+    """ fO_readfile_parquet reads parquet - require the libraries : pyarrow / fastparquet
+    options: use_threads, engine='fastparquet', ... """
+    o_file = pd.read_parquet(str_path, **d_options)
     return o_file
 
 def fStr_ReadFile_sql(str_filePath):
@@ -645,8 +658,6 @@ def fStr_createExcel_SevSh(str_folder, str_FileName, l_dfData, l_SheetName = [],
         print('  ERROR: fl.fStr_createExcel_SevSh did not work: |{}|'.format(err))
         print('  - Path: ', str_path)
         print('  - l_SheetName: ', l_SheetName)
-        try:        xl_writer.save()
-        except:     print('     ***Could not Save the file')
         return False
     return str_path
 
