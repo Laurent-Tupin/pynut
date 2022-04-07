@@ -103,6 +103,17 @@ def test_fDf_DropRowsIfNa_resetIndex():
     df2 = dframe.fDf_DropRowsIfNa_resetIndex(df1, l_colToDropNA = ['col1'])
     assert (len(df2) == len(df1) - 1)
 
+def test_dDf_fillNaColumn():
+    df1 = dframe.fDf_createSimpleDataframe(l_column=['col1', 'col2', 'col3'],
+                                           l_values=[[0, 1, 0.1], [2, np.nan, np.nan], [3, 1, 0.1], [4, 1, 4],
+                                                     [5, np.nan, -3.9], [6, np.nan, 0.1], [7, -7, np.nan]])
+    df2 = dframe.dDf_fillNaColumn(df1, 'col2', 'col1')
+    df3 = dframe.fDf_DropRowsIfNa_resetIndex(df2, l_colToDropNA=['col2'])
+    assert (len(df2) == len(df3))
+
+
+
+
 
 
 

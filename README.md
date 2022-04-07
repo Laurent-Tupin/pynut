@@ -111,6 +111,12 @@ Temporary documentation for nutDataframe :
      """ Drop the rows where all defined columns will be Nan
     And reset the index"""
     
+    df2 = dframe.dDf_fillNaColumn(df1, 'col2', 'col1')
+    """ Replace Nan in a column by the value in another column or a Constant """
+    
+    df2 = dframe.fDf_fillColUnderCondition(df1, 'NameColumnToApply', df1['data'], 'NameColumn Condition', 'YES', bl_except = False)
+    ''' Transform DF with condition
+    ValueToApply can be a value or a lambda function'''
     
     
     

@@ -40,15 +40,20 @@ def fBl_compareDfCol(d_1, d_2, str_how = 'inner'):
     df2 =           d_2['df']
     str_colJoin2 =  d_2['colJoin']
     str_col2 =      d_2['colToCompare']
-    # Join the df
+    # In case ColJoin is not the same
     df = df2[[str_colJoin2, str_col2]].copy()
     if str_colJoin1 != str_colJoin2:
         df[str_colJoin1] = df[str_colJoin2]
+    # In case colToCompare are named the same
+    if str_col2 == str_col1:
+        df.rename(columns = {str_col2: str_col2 + '_col2'}, inplace = True)
+        str_col2 = str_col2 + '_col2'
+    # Join the df
     df = fDf_JoinDf(df1, df, str_colJoin1, str_how)
     # Compare, make the difference
-    df['col1-col2'] = (df[str_col1] - df[str_col2]) #.apply(lambda x: round_corectPythonFlaws(x))
+    df['Diff'] = (df[str_col1] - df[str_col2]).apply(lambda x: round_corectPythonFlaws(x))
     # Prepare the case its not numbers to compare
-    df_compare = df.loc[df['col1-col2'] != 0, [str_colJoin1, str_col1, str_col2,'col1-col2']]
+    df_compare = df.loc[ df['Diff'] != 0, [str_colJoin1, str_col1, str_col2,'Diff'] ]
     int_nbRowDiff = len(df_compare)
     if int_nbRowDiff == 0:  return True, None
     else:                   return False, df_compare
@@ -58,7 +63,9 @@ def fBl_compareDfCol(d_1, d_2, str_how = 'inner'):
 # Special rounding treatment
 #==============================================================================
 def round_down(nb_in, decimals = 0):
-    """floor() rounds down. int() truncates. The difference is clear when you use negative numbers
+    """ Use the Math Function floor() - Able to add a decimals like in Excel
+    floor() rounds down. int() truncates.
+    The difference is clear when you use negative numbers
     math.floor(-3.5)    -4
     int(-3.5)           -3"""
     multiplier = 10 ** int(decimals)
@@ -66,6 +73,7 @@ def round_down(nb_in, decimals = 0):
     return Result
 
 def round_up(nb_in, decimals = 0):
+    """ Use the Math Function ceil() - Able to add a decimals like in Excel"""
     multiplier = 10 ** int(decimals)
     Result = math.ceil(nb_in * multiplier) / multiplier
     return Result
@@ -112,7 +120,7 @@ def round_myRound(nb_in, base = 1):
 # Nan
 #==============================================================================
 def fBl_IsNan(inputValue):
-    """ Test if a value is Nan 
+    """ Test if a value is Nan
     Mainly from Dataframe and used with apply / lambda"""
     if isinstance(inputValue, float):
         if np.isnan(inputValue):
@@ -132,7 +140,10 @@ def fBl_IsNan(inputValue):
 #==============================================================================
 # Read file for Dataframe
 #==============================================================================
-def fDf_readCsv_enhanced(str_path, bl_header = None, str_sep = ',', l_names = None, str_encoding = None):       
+def fDf_readCsv_enhanced(str_path, bl_header = None, str_sep = ',', l_names = None, str_encoding = None):
+    """ Use the pandas method read_csv
+     but resolving Parse Error and will try again after displaying a message
+     Also resolving UnicodeDecodeError by detecting the encoding and trying again accordingly """
     try:
         df_data = pd.read_csv(str_path, header = bl_header, sep = str_sep, names = l_names, encoding = str_encoding)
     # -------------------------------------------------------------
@@ -204,6 +215,8 @@ def fDf_CleanPrepareDF(df_in, l_colToBeFloat = [], l_colToDropNA = [], o_fillNA_
     return df
 
 def fDf_DropRowsIfNa_resetIndex(df, l_colToDropNA = []):
+    """ Drop the rows where all defined columns will be Nan
+    And reset the index"""
     df = df.copy()
     if l_colToDropNA:   df.dropna(axis = 'index', subset = l_colToDropNA, inplace = True)
     else:               df.dropna(axis = 'index', inplace = True)
@@ -211,6 +224,7 @@ def fDf_DropRowsIfNa_resetIndex(df, l_colToDropNA = []):
     return df
 
 def dDf_fillNaColumn(df, str_colTarget, str_colValueToInputIfNA, str_CONST = None):
+    """ Replace Nan in a column by the value in another column or a Constant """
     try:
         if str_CONST is None:
             df[str_colTarget] = df[str_colTarget].fillna(df[str_colValueToInputIfNA])
@@ -234,8 +248,11 @@ def fDf_changeDateFormat(df_in, str_colToApply, str_dateFormatInitial = '%Y%m%d'
     return df_result[l_col]
 
 
-def fDf_fillColUnderCondition(df, str_colToApply, ValueToApply, str_colCondition, ValueCondition, bl_except = False, ValueDefault = 0):
-    ''' Transform un DF avec condition
+
+
+
+def fDf_fillColUnderCondition(df, str_colToApply, ValueToApply, str_colCondition, ValueCondition = None, bl_except = False, ValueDefault = 0):
+    ''' Transform DF with condition
     ValueToApply can be a value or a lambda function
     mask / 'map'
     '''
@@ -245,8 +262,10 @@ def fDf_fillColUnderCondition(df, str_colToApply, ValueToApply, str_colCondition
     # MASK
     if bl_except:   
         df[str_colToApply]      = df[str_colToApply].mask(df[str_colCondition] != ValueCondition, ValueToApply)
+
     elif ValueCondition is None:
         df = dDf_fillNaColumn(df, str_colToApply, str_colCondition)
+
     elif '<=' in str(ValueCondition):
         ValueCondition = float(ValueCondition.replace('<=', ''))
         df[str_colToApply]      = df[str_colToApply].mask(df[str_colCondition] <= ValueCondition, ValueToApply)
@@ -261,8 +280,6 @@ def fDf_fillColUnderCondition(df, str_colToApply, ValueToApply, str_colCondition
     #df[str_colToApply] = [ValueToApply if x == ValueCondition else '-' for x in df[str_colCondition]]
     #df['Units'] = df['Units'].where(df['column'] == 'S', - df['Units'])
     return df
-
-
 
 def fDf_replaceStringColByZero(df, str_colToApply, ValueToApply = 0):
     # df.str.replace(r'\$-', str(ValueToApply))

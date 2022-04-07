@@ -270,7 +270,7 @@ class c_Outlook_dwld(c_Outlook):
                 str_sql = "@SQL=(urn:schemas:httpmail:subject LIKE '%{}%')".format(str_subject)
                 o_emails = o_folder.Items.Restrict(str_sql)
                 if len(o_emails) == 0:
-                    print('   WARNING: We could not find the email with the subject |{}|'.format(str_subject))
+                    print('   WARNING (out): We could not find the email with the subject |{}|'.format(str_subject))
                     raise
             #---------------------------------
             # Time of the EMAIL - str_emailTime
@@ -591,13 +591,14 @@ class c_Webmail_dwld(c_Webmail):
                     print('   ... Bracket: ', tz_start, tz_end)
                     # TODO: Look if you launch back up again the search with just SUBJECT like with OUTLOOK
                 elif str_subject != '': 
-                    print(' WARNING: We could not find the email with the subject |{}|'.format(str_subject))
+                    print(' WARNING (exclib): We could not find the email with the subject |{}|'.format(str_subject))
                 raise
         except Exception as err:
             print(' ERROR in getEmails_Restict: |{}|'.format(err))
             print(' - str_subject: ', str_subject)
             print(' - str_emailTime: ', str_emailTime)
-            print(' - Bracket: ', tz_start, tz_end)
+            try:    print(' - Bracket: ', tz_start, tz_end)
+            except: pass
             # print(' - Email Param: ', self.o_emailParam)
             raise
         self.o_emails = o_emails
