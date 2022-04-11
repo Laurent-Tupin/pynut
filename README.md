@@ -114,10 +114,34 @@ Temporary documentation for nutDataframe :
     df2 = dframe.dDf_fillNaColumn(df1, 'col2', 'col1')
     """ Replace Nan in a column by the value in another column or a Constant """
     
-    df2 = dframe.fDf_fillColUnderCondition(df1, 'NameColumnToApply', df1['data'], 'NameColumn Condition', 'YES', bl_except = False)
+    df2 = dframe.fDf_fillColUnderCondition(df1, 'NameColumnToApply', df1['data'], 'NameColumnCondition', 'YES', bl_except = False)
     ''' Transform DF with condition
     ValueToApply can be a value or a lambda function'''
     
+    
+    
+Temporary documentation for nutOther :
+    
+    1. Decorators
+    
+    @oth.dec_singletonsClass
+    class CLASS_TO_DECORATE():
+    ''' Singeltons decorators: always use the first instance 
+    Example: connection to database, FTP (keep the same connection for performance and possibly Access issue)
+    '''    
+    
+    @oth.dec_getTimePerf(int_secondesLimitDisplay = 2)
+    def function_TO_DECORATE(*args, **kwarks):
+    ''' Time Performance Decorators on a function
+    You can calculate and compare Performance on any function just by decorating it
+    It will show nothing if the performance is better than a specific threshold you will defined
+    '''   
+    
+    @oth.dec_stopProcessTimeOut(int_secondesLimit = 10, returnIfTimeOut = False)
+    def function_TO_DECORATE(*args, **kwarks):
+    ''' This decorators allow to stop a process if it is too long
+    For example, testing a folder existence might be very very long...
+    '''
     
     
 
@@ -133,7 +157,6 @@ Temporary documentation for nutFiles :
     
     
     
-___END______________________
 
 
 
