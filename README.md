@@ -74,7 +74,6 @@ Temporary documentation for nutDate :
     And return the associated date  """
     
     
-
 Temporary documentation for nutDataframe :
 
     import pyNut.nutDataframe as dframe
@@ -116,11 +115,12 @@ Temporary documentation for nutDataframe :
     
     df2 = dframe.fDf_fillColUnderCondition(df1, 'NameColumnToApply', df1['data'], 'NameColumnCondition', 'YES', bl_except = False)
     ''' Transform DF with condition
-    ValueToApply can be a value or a lambda function'''
-    
+    ValueToApply can be a value or a lambda function'''   
     
     
 Temporary documentation for nutOther :
+    
+    from pyNut import nutOther as oth
     
     1. Decorators
     
@@ -143,21 +143,63 @@ Temporary documentation for nutOther :
     For example, testing a folder existence might be very very long...
     '''
     
-    
 
 Temporary documentation for nutFiles :
 
     from pyNut import nutFiles as fl
     
-    l_fileList_consti = fl.fL_listFile(str_path_consti)
-    "" fL_listFile is listing all files in a folder using the library glob """
+    fileName = fl.fStr_myFileName(__file__)
+    ''' Get the Python File Name '''
     
-    o_file = fl.fO_readfile_parquet(str_path)
-    """ fO_readfile_parquet reads parquet - require the libraries : pyarrow / fastparquet"""
+    myPath = fl.fStr_myPath(__file__)
+    ''' Get the path of the Python File'''
+    
+    EnvUserName = fl.fStr_GetEnvUserName()
+    ''' Get the Environment of the USERPROFILE'''
+    
+    UserEmail = fl.fStr_GetUserEmail(str_emailExtension = '@corporation.com')
+    ''' Get the Corporate Email of the user '''
+    
+    folder = fl.fStr_GetFolderFromPath(myPath)
+    ''' Get the Folder from a file path '''
+    
+    FileName = fl.fStr_GetFileFromPath(myPath)
+    ''' Get the file Name from a file path '''
+    
+    l_files =   fl.fL_listFile(myFolder)
+    """ Listing all files and folder in a folder using the library glob """
+    
+    l_files =   fl.fList_FileInDir(myFolder)
+    """ Listing all files and folder in a folder using the library os """    
+    
+    if not fl.fBl_FileExist(_path):
+    """ Test if a file exist. Giving a path, return a Boolean """
+    
+    if not fl.fBl_FolderExist(_path):
+    """ Test if a folder exist. Giving a folder path, return a Boolean """
+    
+    if not fl.fBl_FolderExist_timeout(_path):
+    """ Test if a folder exist. Giving a folder path, return a Boolean
+    The function is decorated not to search for more than 10 secondes """
+    
+    fl.TrimTxtFile(str_path, bl_right = True)
+    """ This function will Trim the space in a text file
+    We can decide to Trim only the space on the left or right 
+    By default, the Trim is both side"""
+    
+    fl.Act_Rename(str_newFolder, str_oldName, str_newName, False)
+    """ Renaming a file and if it failed using the lib os, it will MOVE the file with shutil """
+    
+    newName = fl.fStr_TransformFilName_fromXXX_forGlobFunction(fileName, bl_exactNumberX = False)
+    """ Change a string with unknown characters (XXXX) into sth understandable by the glob library
+    'file_{*}_1.zip' ==> 'file_*_1.zip'     ( bl_exactNumberX = False)
+    'file_{XXXX}_1.zip' ==> 'file_????.zip' ( bl_exactNumberX = True)
+    'file_{XXXX}.zip' ==> 'file_*.zip'      ( bl_exactNumberX = False)
+    """
+    
+    L_filIn =   fl.fL_GetFileListInFolder(myFolder, fileName_X, bl_searchOnly, bl_exactNb)
+    """ Return the list of files in a folder that match the pattern given of the fileName 
+    with {*} or {XXX} within """
     
     
     
-
-
-
-

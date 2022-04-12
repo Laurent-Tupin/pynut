@@ -14,7 +14,7 @@ except:
 #=============================================================================
 def test_fDf_createSimpleDataframe():
     df_simple = dframe.fDf_createSimpleDataframe()
-    assert( isinstance(df_simple, pd.DataFrame) )
+    assert (isinstance(df_simple, pd.DataFrame))
 
 def test_fBl_isDataframeEmpty():
     df_simple = dframe.fDf_createSimpleDataframe()
@@ -110,4 +110,3 @@ def test_dDf_fillNaColumn():
     df2 = dframe.dDf_fillNaColumn(df1, 'col2', 'col1')
     df3 = dframe.fDf_DropRowsIfNa_resetIndex(df2, l_colToDropNA=['col2'])
     assert (len(df2) == len(df3))
-

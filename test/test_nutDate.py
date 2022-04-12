@@ -1,6 +1,11 @@
 import datetime
 import time
-import pyNut.nutDate as dat
+try:
+    import nutDate as dat
+except:
+    print('Online Test...')
+    from pyNut import nutDate as dat
+
 #import pytest
 
 
@@ -49,6 +54,3 @@ def test_fDte_convertExcelInteger():
     print(dte_date)
     print(type(dte_date))
     assert (isinstance(dte_date, time.struct_time))
-
-
-

@@ -8,7 +8,7 @@ except:
 
 
 @oth.dec_singletonsClass
-class C_Example():
+class C_Example:
     def __init__(self, Param1):
         self.Param1 = Param1
 
