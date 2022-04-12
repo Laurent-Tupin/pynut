@@ -6,7 +6,7 @@ try:
     import nutDataframe as dframe
 except:
     print('Online Test...')
-    import pyNut.nutDataframe as dframe
+    from pyNut import nutDataframe as dframe
 
 
 #=============================================================================

@@ -4,7 +4,7 @@ try:
     import nutOther as oth
 except:
     print('Online Test...')
-    import pyNut.nutOther as oth
+    from pyNut import nutOther as oth
 
 
 @oth.dec_singletonsClass
