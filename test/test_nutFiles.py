@@ -60,16 +60,25 @@ def test_fStr_TransformFilName_fromXXX_forGlobFunction(fileName, expectedReturn,
 
 @pytest.mark.parametrize("fileName_X, bl_searchOnly, bl_exactNb, exp_fileName",
                          [('test_{XXX}Files.py', False, True, None),
-                          # ('test_{XX}Files.py', False, False, None),
-                          # ('test_{*}Files.py', False, True, None),
-                          # ('test_{X}Files.py', False, True, None),
-                          # ('abc_{XXX}_abc.py', True, None, 'abc_{XXX}_abc.py')
+                          ('test_{XX}Files.py', False, False, None),
+                          ('test_{XX}Files.py', False, True, None),
+                          ('test_{*}Files.py', False, True, None),
+                          ('test_{X}Files.py', False, True, None),
+                          ('abc_{XXX}_abc.py', True, None, 'abc_{XXX}_abc.py')
                           ])
 def test_fL_GetFileListInFolder(fileName_X, bl_searchOnly, bl_exactNb, exp_fileName):
     myFolder =  fl.fStr_myPath(__file__)
     if exp_fileName is None:    fileName = fl.fStr_myFileName(__file__)
     else:                       fileName = exp_fileName
     L_filIn =   fl.fL_GetFileListInFolder(myFolder, fileName_X, bl_searchOnly, bl_exactNb)
+    L_filIn = [fl.fStr_GetFileFromPath(path) for path in L_filIn]
     assert (fileName in L_filIn)
 
-
+@pytest.mark.parametrize("fileName_X, bl_searchOnly, bl_exactNb",
+                         [('abc_{XXX}_abc.py', False, True),
+                          ('abc_{XXX}_abc.py', False, False)])
+def test_FAIL_fL_GetFileListInFolder(fileName_X, bl_searchOnly, bl_exactNb):
+    myFolder =  fl.fStr_myPath(__file__)
+    fileName = fl.fStr_myFileName(__file__)
+    with pytest.raises(Exception):
+        fl.fL_GetFileListInFolder(myFolder, fileName_X, bl_searchOnly, bl_exactNb)

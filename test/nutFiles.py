@@ -275,7 +275,7 @@ def fL_GetFileListInFolder(str_folder, str_fileName_withX, bl_searchOnlyIfPossib
                 return [str_folder + str_fileName_withX]
             else:
                 if bl_exactNumberX:
-                    print(' EMPTY fL_GetFileListInFolder... We will now search with more flex')
+                    print(' EMPTY fL_GetFileListInFolder with exact number of X... We will now search with more flex')
                     l_filesFlex = fL_GetFileListInFolder(str_folder, str_fileName_withX, False, False)
                     return l_filesFlex
                 else:                
