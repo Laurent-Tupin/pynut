@@ -4,10 +4,16 @@ try:
     from . import nutDate as dat
     from . import nutOther as oth
 except:
-    import _lib as lib
-    import nutDataframe as dframe
-    import nutDate as dat
-    import nutOther as oth
+    try:
+        import _lib as lib
+        import nutDataframe as dframe
+        import nutDate as dat
+        import nutOther as oth
+    except:
+        from pyNut import _lib as lib
+        from pyNut import nutDataframe as dframe
+        from pyNut import nutDate as dat
+        from pyNut import nutOther as oth
 os          = lib.os()
 time        = lib.time()
 dt          = lib.datetime()
@@ -33,63 +39,65 @@ fDte_datePast = dat.fDte_datePast
 
 
 #------------------------------------------------------------------------------
-# List Files in folder
+# Files Characteristics
 #------------------------------------------------------------------------------
-def fL_listFile(str_path):
-    """ fL_listFile is listing all files in a folder using the library glob """
-    l_fileList = glob.glob(os.path.join(str_path, '*'))
-    return l_fileList
-
+def fStr_myFileName(o_file = None):
+    ''' Get the Python File Name '''
+    if o_file is None:  return os.path.basename(__file__)
+    else:               return os.path.basename(o_file)
+def fStr_myPath(o_file = None):
+    ''' Get the path of the Python File'''
+    #os.getcwd()
+    if o_file is None:  return os.path.dirname(os.path.abspath(__file__))
+    else:               return os.path.dirname(os.path.abspath(o_file))
 def fStr_GetEnvUserName():
+    ''' Get the Environment of the USERPROFILE'''
     return os.environ['USERPROFILE']
 def fStr_GetUserEmail(str_emailExtension = '@gmail.com'):
+    ''' Get the Corporate Email of the user '''
     str_env = fStr_GetEnvUserName()
     str_env = str_env.replace(r'C:\Users' + '\\', '')
     return str_env + str_emailExtension
-    
 def fStr_GetFolderFromPath(str_path):
+    ''' Get the Folder from a file path '''
     str_folder = str('\\'.join(str_path.split('\\')[:-1]))
     return str_folder
 def fStr_GetFileFromPath(str_path):
+    ''' Get the file Name from a file path '''
     str_fileName = str(str_path.split('\\')[-1])
     return str_fileName
-
-def fStr_myFileName():
-    return os.path.basename(__file__)
-
-def fStr_myPath():
-    #os.getcwd()
-    return os.path.dirname(os.path.abspath(__file__))
-
 def fStr_BuildPath(str_folder, str_FileName):
-    if str_FileName == '':      str_path = str_folder
-    elif str_folder == '':      str_path = str_FileName
-    else:                       str_path = os.path.join(str_folder, str_FileName)
+    if str_FileName == '':
+        str_path = str_folder
+    elif str_folder == '':
+        str_path = str_FileName
+    else:
+        str_path = os.path.join(str_folder, str_FileName)
     return str_path
-
 def fStr_BuildFolder_wRoot(str_folderPart, str_folderRoot):
-    if str_folderPart[:2] == '\\\\':    return str_folderPart
-    elif str_folderPart[:2] == 'C:':    return str_folderPart
-    elif str_folderPart[:2] == 'E:':    return str_folderPart
+    if str_folderPart[:2] == '\\\\':
+        return str_folderPart
+    elif str_folderPart[:2] == 'C:':
+        return str_folderPart
+    elif str_folderPart[:2] == 'E:':
+        return str_folderPart
     elif 'Manual_py' in str_folderPart:
         str_newRoot = str_folderRoot.replace('Auto_py\\', '')
         return os.path.join(str_newRoot, str_folderPart)
-    else:                               
+    else:
         return os.path.join(str_folderRoot, str_folderPart)
-    
-def fBl_FileExist(str_path):
-    if os.path.isfile(str_path):    return True
-    else:                           return False
 
-def fBl_FolderExist(str_path):
-    if os.path.exists(str_path):    return True
-    else:                           return False
-    
-@oth.dec_stopProcessTimeOut(int_secondesLimit = 10, returnIfTimeOut = False)
-def fBl_FolderExist_timeout(str_path):
-    return fBl_FolderExist(fBl_FolderExist)
-    
+
+#------------------------------------------------------------------------------
+# List Files in folder
+#------------------------------------------------------------------------------
+def fL_listFile(str_path):
+    """ Listing all files and folder in a folder using the library glob """
+    l_fileList = glob.glob(os.path.join(str_path, '*'))
+    return l_fileList
+
 def fList_FileInDir(str_path):
+    """ Listing all files and folder in a folder using the library os """
     try:        l_fic = os.listdir(str_path)
     except:
         print(' ERROR in fList_FileInDir')
@@ -127,6 +135,22 @@ def fList_FileInDir_Py(str_path):
         raise
     return l_fic
 
+def fBl_FileExist(str_path):
+    """ Test if a file exist. Giving a path, return a Boolean """
+    if os.path.isfile(str_path):    return True
+    else:                           return False
+
+def fBl_FolderExist(str_path):
+    """ Test if a folder exist. Giving a folder path, return a Boolean """
+    if os.path.exists(str_path):    return True
+    else:                           return False
+    
+@oth.dec_stopProcessTimeOut(int_secondesLimit = 10, returnIfTimeOut = False)
+def fBl_FolderExist_timeout(str_path):
+    """ Test if a folder exist. Giving a folder path, return a Boolean
+    The function is decorated not to search for more than 10 secondes """
+    return fBl_FolderExist(fBl_FolderExist)
+
 def UpdateTxtFile(str_path, str_old, str_new = ''):
     with open(str_path, 'r') as file :
         str_text = file.read()
@@ -137,6 +161,9 @@ def UpdateTxtFile(str_path, str_old, str_new = ''):
         file.write(str_text)
 
 def TrimTxtFile(str_path, bl_right = False, bl_left = False):
+    """ This function will Trim the space in a text file
+    We can decide to Trim only the space on the left or right
+    By default, the Trim is both side"""
     with open(str_path, 'r') as file :
         str_lines = file.readlines()
     # remove spaces    
@@ -159,7 +186,8 @@ def fBk_OpenWk_xlrd(str_path):
 #------------------------------------------------------------------------------
 # Transform Names
 #------------------------------------------------------------------------------
-def Act_Rename(str_folder, str_OriginalName, str_NewName, bl_message = True):    
+def Act_Rename(str_folder, str_OriginalName, str_NewName, bl_message = True):
+    """ Renaming a file and if it failed using the lib os, it will MOVE the file with shutil """
     try:
         if str_NewName.upper() != str_OriginalName.upper():
             if bl_message:
@@ -176,8 +204,12 @@ def Act_Rename(str_folder, str_OriginalName, str_NewName, bl_message = True):
         raise
     return True
 
-
 def fStr_TransformFilName_fromXXX_forGlobFunction(str_fileName_withX, bl_exactNumberX = False):
+    """ Change a string with unknown characters (XXXX) into sth understandable by the glob library
+    'file_{*}_1.zip' ==> 'file_*_1.zip'     ( bl_exactNumberX = False)
+    'file_{XXXX}_1.zip' ==> 'file_????.zip' ( bl_exactNumberX = True)
+    'file_{XXXX}.zip' ==> 'file_*.zip'      ( bl_exactNumberX = False)
+    """
     # Check if its a single {*}
     if '{*}' in str_fileName_withX:
         str_fileName_withX = str_fileName_withX.replace('{*}', '{X}')
@@ -187,14 +219,14 @@ def fStr_TransformFilName_fromXXX_forGlobFunction(str_fileName_withX, bl_exactNu
         return str_fileName_withX
     
     # Count the Number of Series of {XX} 
-    int_nbXX = str_fileName_withX.count('{X')
-    int_nbXX2 = str_fileName_withX.count('X}')
+    int_nbXX =      str_fileName_withX.count('{X')
+    int_nbXX2 =     str_fileName_withX.count('X}')
     if int_nbXX != int_nbXX2: 
         print('   ERROR, check the sting str_fileName_withX in fStr_TransformFilName_fromXXX: ', str_fileName_withX)
         return str_fileName_withX
     
     # Count the number of X in each Series of {XX}
-    str_fileName = str_fileName_withX
+    str_fileName =  str_fileName_withX
     nb = 1
     while nb in range(1, int_nbXX + 1):
         nb += 1
@@ -217,7 +249,9 @@ def fStr_TransformFilName_fromXXX_forGlobFunction(str_fileName_withX, bl_exactNu
 
 
 #Return a list of File in a folder
-def fL_GetFileListInFolder(str_folder, str_fileName_withX, bl_searchOnlyIfPossible = False, bl_exactNumberX = True):    
+def fL_GetFileListInFolder(str_folder, str_fileName_withX, bl_searchOnlyIfPossible = False, bl_exactNumberX = True):
+    """ Return the list of files in a folder that match the pattern given of the fileName
+    with {*} or {XXX} within """
     if str_folder[-1] != '\\': str_folder += '\\'
     
     try:
@@ -236,12 +270,12 @@ def fL_GetFileListInFolder(str_folder, str_fileName_withX, bl_searchOnlyIfPossib
                 return L_files
                 #++++++++++++++++++++++++++++++++++++++++++++++++++++
             # Do not raise an issue if its a search, just return File with XX
-            elif bl_searchOnlyIfPossible:                   
+            elif bl_searchOnlyIfPossible is True:
                 #print(' Return the file with the X (Search only): ', str_fileName_withX)
                 return [str_folder + str_fileName_withX]
             else:
                 if bl_exactNumberX:
-                    print(' EMPTY fL_GetFileListInFolder... We will now search with more flex')
+                    print(' EMPTY fL_GetFileListInFolder with exact number of X... We will now search with more flex')
                     l_filesFlex = fL_GetFileListInFolder(str_folder, str_fileName_withX, False, False)
                     return l_filesFlex
                 else:                
@@ -252,14 +286,17 @@ def fL_GetFileListInFolder(str_folder, str_fileName_withX, bl_searchOnlyIfPossib
         print('   - str_folder: ', str_folder)
         print('   - str_fileName_withX: ', str_fileName_withX)
         raise
-    return 0
+    return False
     
 def fStr_GetMostRecentFile_InFolder(str_folder, str_fileName_withX, bl_searchOnlyIfPossible = False, bl_exactNumberX = True):
+    """ Return the list of files in a folder that match the pattern given of the fileName
+    with {*} or {XXX} within
+    AND take the most recent one"""
     if str_folder[-1] != '\\': str_folder += '\\'
     # Get the lisyt of matching files
     try:
         str_fileName_withX = str_fileName_withX.replace('{*}','{X}')
-        L_FileInFolder = fL_GetFileListInFolder(str_folder, str_fileName_withX, bl_searchOnlyIfPossible, bl_exactNumberX)
+        L_FileInFolder =    fL_GetFileListInFolder(str_folder, str_fileName_withX, bl_searchOnlyIfPossible, bl_exactNumberX)
     except Exception as err: 
         print('  ERROR fStr_GetMostRecentFile_InFolder, : |{}|'.format(err))
         print('  - str_folder: ',str_folder)
@@ -279,15 +316,21 @@ def fStr_GetMostRecentFile_InFolder(str_folder, str_fileName_withX, bl_searchOnl
         raise
     return str_fileName
 
+
+
 def fL_GetFileList_withinModel(L_FileName, str_fileName_withX):
+    """ If you have in memory a list of File Name
+    you want to return the list of those who match the pattern given of the fileName
+    with {*} or {XXX} within
+    """
     try:
         # Check if its a normal Name without {X}:
         if '{X' not in str_fileName_withX and 'X}' not in str_fileName_withX and '{*}' not in str_fileName_withX:
             L_FileName = [fil for fil in L_FileName if str_fileName_withX.lower() in fil.lower()]
             return L_FileName	
         # Count the Number of Series of {XX} 
-        int_nbXX = str_fileName_withX.count('{X')
-        int_nbXX2 = str_fileName_withX.count('X}')
+        int_nbXX =      str_fileName_withX.count('{X')
+        int_nbXX2 =     str_fileName_withX.count('X}')
         if int_nbXX != int_nbXX2: 
             print('   ERROR, check the string str_fileName_withX in fL_GetFileList_withinModel: ', str_fileName_withX)
             return L_FileName
@@ -298,7 +341,7 @@ def fL_GetFileList_withinModel(L_FileName, str_fileName_withX):
                 str_XXX = '{' + i * 'X' + '}'
                 if str_fileName.count(str_XXX) == 1: break
             str_fileName = str_fileName.replace(str_XXX, '{*}')
-	# END
+        # END
         l_fileName_part = str_fileName.split('{*}')
         l_files = L_FileName
         for name_part in l_fileName_part:
@@ -319,7 +362,8 @@ def fDte_GetModificationDate(str_pathFile):
     try:
         if fBl_FileExist(str_pathFile):
             dte_modif = os.path.getmtime(str_pathFile)
-            dte_modif = dt.datetime.fromtimestamp(dte_modif)
+            # dte_modif = dt.datetime.fromtimestamp(dte_modif)
+            dte_modif = dat.fDte_formatToTimeStamp(dte_modif)
         else:
             print('  fDte_GetModificationDate: File does not exist: ')
             print('  - str_pathFile: ', str_pathFile)
