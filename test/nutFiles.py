@@ -289,11 +289,14 @@ def fL_GetFileListInFolder(str_folder, str_fileName_withX, bl_searchOnlyIfPossib
     return False
     
 def fStr_GetMostRecentFile_InFolder(str_folder, str_fileName_withX, bl_searchOnlyIfPossible = False, bl_exactNumberX = True):
+    """ Return the list of files in a folder that match the pattern given of the fileName
+    with {*} or {XXX} within
+    AND take the most recent one"""
     if str_folder[-1] != '\\': str_folder += '\\'
     # Get the lisyt of matching files
     try:
         str_fileName_withX = str_fileName_withX.replace('{*}','{X}')
-        L_FileInFolder = fL_GetFileListInFolder(str_folder, str_fileName_withX, bl_searchOnlyIfPossible, bl_exactNumberX)
+        L_FileInFolder =    fL_GetFileListInFolder(str_folder, str_fileName_withX, bl_searchOnlyIfPossible, bl_exactNumberX)
     except Exception as err: 
         print('  ERROR fStr_GetMostRecentFile_InFolder, : |{}|'.format(err))
         print('  - str_folder: ',str_folder)
@@ -313,15 +316,21 @@ def fStr_GetMostRecentFile_InFolder(str_folder, str_fileName_withX, bl_searchOnl
         raise
     return str_fileName
 
+
+
 def fL_GetFileList_withinModel(L_FileName, str_fileName_withX):
+    """ If you have in memory a list of File Name
+    you want to return the list of those who match the pattern given of the fileName
+    with {*} or {XXX} within
+    """
     try:
         # Check if its a normal Name without {X}:
         if '{X' not in str_fileName_withX and 'X}' not in str_fileName_withX and '{*}' not in str_fileName_withX:
             L_FileName = [fil for fil in L_FileName if str_fileName_withX.lower() in fil.lower()]
             return L_FileName	
         # Count the Number of Series of {XX} 
-        int_nbXX = str_fileName_withX.count('{X')
-        int_nbXX2 = str_fileName_withX.count('X}')
+        int_nbXX =      str_fileName_withX.count('{X')
+        int_nbXX2 =     str_fileName_withX.count('X}')
         if int_nbXX != int_nbXX2: 
             print('   ERROR, check the string str_fileName_withX in fL_GetFileList_withinModel: ', str_fileName_withX)
             return L_FileName
@@ -332,7 +341,7 @@ def fL_GetFileList_withinModel(L_FileName, str_fileName_withX):
                 str_XXX = '{' + i * 'X' + '}'
                 if str_fileName.count(str_XXX) == 1: break
             str_fileName = str_fileName.replace(str_XXX, '{*}')
-	# END
+        # END
         l_fileName_part = str_fileName.split('{*}')
         l_files = L_FileName
         for name_part in l_fileName_part:
@@ -353,7 +362,8 @@ def fDte_GetModificationDate(str_pathFile):
     try:
         if fBl_FileExist(str_pathFile):
             dte_modif = os.path.getmtime(str_pathFile)
-            dte_modif = dt.datetime.fromtimestamp(dte_modif)
+            # dte_modif = dt.datetime.fromtimestamp(dte_modif)
+            dte_modif = dat.fDte_formatToTimeStamp(dte_modif)
         else:
             print('  fDte_GetModificationDate: File does not exist: ')
             print('  - str_pathFile: ', str_pathFile)

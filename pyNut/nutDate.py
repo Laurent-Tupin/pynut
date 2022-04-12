@@ -87,7 +87,7 @@ def fDte_formatToDate(dte_date, str_dateFormat = '%Y-%m-%d', bl_stopLoop = False
 
 def fDte_formatToTimeStamp(dte_date):
     try:
-        dte_formatToDate = dt.datetime.fromtimestamp
+        dte_formatToDate = dt.datetime.fromtimestamp(dte_date)
     except Exception as err:
         print(' ERROR in fDte_formatToTimeStamp')
         print(' - Error: ', err)

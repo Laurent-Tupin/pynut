@@ -201,5 +201,20 @@ Temporary documentation for nutFiles :
     """ Return the list of files in a folder that match the pattern given of the fileName 
     with {*} or {XXX} within """
     
+    fileName = fl.fStr_GetMostRecentFile_InFolder(folder, fileName_X)
+    """ Return the list of files in a folder that match the pattern given of the fileName
+    with {*} or {XXX} within
+    AND take the most recent one"""
+    
+    l_files_X = fl.fL_GetFileList_withinModel(l_files, str_fileName)
+    """ If you have in memory a list of File Name
+    you want to return the list of those who match the pattern given of the fileName
+    with {*} or {XXX} within
+    """
+    
+    
+    
+    
+    
     
     

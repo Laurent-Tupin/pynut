@@ -44,10 +44,10 @@ def test_fStr_BuildPath():
 
 def test_fL_listFile():
     myFolder =  fl.fStr_myPath(__file__)
-    l_files =   fl.fL_listFile(myFolder)
     fileName =  fl.fStr_myFileName(__file__)
-    assert (fileName in fileName)
-
+    l_files =   fl.fL_listFile(myFolder)
+    l_files = [fl.fStr_GetFileFromPath(path) for path in l_files]
+    assert (fileName in l_files)
 
 @pytest.mark.parametrize("fileName, expectedReturn, bl_exactNumb",
                          [('file_{*}_1.zip', 'file_*_1.zip', False),
@@ -56,7 +56,6 @@ def test_fL_listFile():
 def test_fStr_TransformFilName_fromXXX_forGlobFunction(fileName, expectedReturn, bl_exactNumb):
     str_newName = fl.fStr_TransformFilName_fromXXX_forGlobFunction(fileName, bl_exactNumberX = bl_exactNumb)
     assert str_newName == expectedReturn
-
 
 @pytest.mark.parametrize("fileName_X, bl_searchOnly, bl_exactNb, exp_fileName",
                          [('test_{XXX}Files.py', False, True, None),
@@ -79,6 +78,60 @@ def test_fL_GetFileListInFolder(fileName_X, bl_searchOnly, bl_exactNb, exp_fileN
                           ('abc_{XXX}_abc.py', False, False)])
 def test_FAIL_fL_GetFileListInFolder(fileName_X, bl_searchOnly, bl_exactNb):
     myFolder =  fl.fStr_myPath(__file__)
-    fileName = fl.fStr_myFileName(__file__)
     with pytest.raises(Exception):
         fl.fL_GetFileListInFolder(myFolder, fileName_X, bl_searchOnly, bl_exactNb)
+
+@pytest.mark.parametrize("fileName_X, bl_searchOnly, bl_exactNb, exp_fileName",
+                         [('test_{XXX}Files.py', False, True, None),
+                          ('test_{XX}Files.py', False, False, None),
+                          ('test_{XX}Files.py', False, True, None),
+                          ('test_{*}Files.py', False, True, None),
+                          ('test_{X}Files.py', False, True, None),
+                          ('abc_{XXX}_abc.py', True, None, 'abc_{XXX}_abc.py')
+                          ])
+def test_fStr_GetMostRecentFile_InFolder(fileName_X, bl_searchOnly, bl_exactNb, exp_fileName):
+    myFolder =  fl.fStr_myPath(__file__)
+    if exp_fileName is None:    fileName = fl.fStr_myFileName(__file__)
+    else:                       fileName = exp_fileName
+    str_fileName =  fl.fStr_GetMostRecentFile_InFolder(myFolder, fileName_X, bl_searchOnly, bl_exactNb)
+    assert (fileName == str_fileName)
+
+@pytest.mark.parametrize("fileName_X, bl_searchOnly, bl_exactNb",
+                         [('abc_{XXX}_abc.py', False, True),
+                          ('abc_{XXX}_abc.py', False, False)])
+def test_FAIL_fStr_GetMostRecentFile_InFolder(fileName_X, bl_searchOnly, bl_exactNb):
+    myFolder =  fl.fStr_myPath(__file__)
+    with pytest.raises(Exception):
+        fl.fStr_GetMostRecentFile_InFolder(myFolder, fileName_X, bl_searchOnly, bl_exactNb)
+
+
+@pytest.mark.parametrize("fileName_X",
+                         [('test_nutFiles.py'), ('_nutFiles.py'),
+                          ('test_{XXX}Files.py'), ('test_{XX}Files.py'), ('test_{X}Files.py'),
+                          ('test_{*}Files.py')])
+def test_fL_GetFileList_withinModel(fileName_X):
+    myFolder =  fl.fStr_myPath(__file__)
+    fileName =  fl.fStr_myFileName(__file__)
+    l_files =   fl.fL_listFile(myFolder)
+    l_files_X = fl.fL_GetFileList_withinModel(l_files, fileName_X)
+    l_files_X = [fl.fStr_GetFileFromPath(path) for path in l_files_X]
+    assert (fileName in l_files_X)
+    assert (len(l_files_X) == 1)
+
+@pytest.mark.parametrize("fileName_X", [('test_{XXXFiles.py')])
+def test_fL_GetFileList_withinModel_2(fileName_X):
+    myFolder =  fl.fStr_myPath(__file__)
+    fileName =  fl.fStr_myFileName(__file__)
+    l_files =   fl.fL_listFile(myFolder)
+    l_files_X = fl.fL_GetFileList_withinModel(l_files, fileName_X)
+    l_files_X = [fl.fStr_GetFileFromPath(path) for path in l_files_X]
+    assert (fileName in l_files_X)
+
+@pytest.mark.parametrize("fileName_X", [('abc_{XXX}_abc.py')])
+def test_fL_GetFileList_withinModel_empty(fileName_X):
+    myFolder = fl.fStr_myPath(__file__)
+    l_files = fl.fL_listFile(myFolder)
+    l_files_X = fl.fL_GetFileList_withinModel(l_files, fileName_X)
+    assert (len(l_files_X) == 0)
+
+
