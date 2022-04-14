@@ -62,16 +62,16 @@ Temporary documentation for nutDate :
     
     dte_date = dat.fDte_formatToDate(dte_date, str_dateFormat = '%d/%m/%Y')
     """ fDte_formatToDate makes sure you will have a varable with a date format
-    The first Argument is the Variable (date), and the format of the string if it is a sting
-    It allows you to avoid testing the type of the variable and get your get Date anyhow"""
+        The first Argument is the Variable (date), and the format of the string if it is a sting
+        It allows you to avoid testing the type of the variable and get your get Date anyhow"""
     
     int_dateDiff = dat.fInt_dateDifference(dte_date1, dte_date2)
     """ fInt_dateDifference give you the difference in days between 2 dates"""
     
     Date2 = dat.fDte_convertExcelInteger(Date)
     """ fDte_convertExcelInteger takes an integer as input, 
-    This is the integer you can find in Excel when it is a date 
-    And return the associated date  """
+        This is the integer you can find in Excel when it is a date 
+        And return the associated date  """
     
     
 Temporary documentation for nutDataframe :
@@ -90,32 +90,32 @@ Temporary documentation for nutDataframe :
     
     df_1['DataRounded'] = df_1['DataToBeRounded'].apply(lambda x: dframe.round_down(x))
     """ Use the Math Function floor() - Able to add a decimals like in Excel
-    floor() rounds down. int() truncates. 
-    The difference is clear when you use negative numbers
-    math.floor(-3.5)    -4
-    int(-3.5)           -3"""
+        floor() rounds down. int() truncates. 
+        The difference is clear when you use negative numbers
+        math.floor(-3.5)    -4
+        int(-3.5)           -3"""
     
     df_2['DataRounded'] = df_2['DataToBeRounded'].apply(lambda x: dframe.round_up(x))
     """ Use the Math Function ceil() - Able to add a decimals like in Excel"""
     
     df_data = dframe.fDf_readCsv_enhanced(path, bl_header = None, str_sep = '|', l_names = range(33))
     """ Use the pandas method read_csv
-     but resolving Parse Error and will try again after displaying a message 
-     Also resolving UnicodeDecodeError by detecting the encoding and trying again accordingly """
+        but resolving Parse Error and will try again after displaying a message 
+        Also resolving UnicodeDecodeError by detecting the encoding and trying again accordingly """
      
-     df2 = dframe.fDf_removeDoublons(df1)
-     """ Remove all rows that are exactly the same"""
+    df2 = dframe.fDf_removeDoublons(df1)
+    """ Remove all rows that are exactly the same"""
      
-     df2 = dframe.fDf_DropRowsIfNa_resetIndex(df1, l_colToDropNA = ['col1'])
-     """ Drop the rows where all defined columns will be Nan
-    And reset the index"""
+    df2 = dframe.fDf_DropRowsIfNa_resetIndex(df1, l_colToDropNA = ['col1'])
+    """ Drop the rows where all defined columns will be Nan
+        And reset the index"""
     
     df2 = dframe.dDf_fillNaColumn(df1, 'col2', 'col1')
     """ Replace Nan in a column by the value in another column or a Constant """
     
     df2 = dframe.fDf_fillColUnderCondition(df1, 'NameColumnToApply', df1['data'], 'NameColumnCondition', 'YES', bl_except = False)
     ''' Transform DF with condition
-    ValueToApply can be a value or a lambda function'''   
+        ValueToApply can be a value or a lambda function'''   
     
     
 Temporary documentation for nutOther :
@@ -127,21 +127,21 @@ Temporary documentation for nutOther :
     @oth.dec_singletonsClass
     class CLASS_TO_DECORATE():
     ''' Singeltons decorators: always use the first instance 
-    Example: connection to database, FTP (keep the same connection for performance and possibly Access issue)
-    '''    
+        Example: connection to database, FTP (keep the same connection for performance and possibly Access issue)
+        '''    
     
     @oth.dec_getTimePerf(int_secondesLimitDisplay = 2)
     def function_TO_DECORATE(*args, **kwarks):
     ''' Time Performance Decorators on a function
-    You can calculate and compare Performance on any function just by decorating it
-    It will show nothing if the performance is better than a specific threshold you will defined
-    '''   
+        You can calculate and compare Performance on any function just by decorating it
+        It will show nothing if the performance is better than a specific threshold you will defined
+        '''   
     
     @oth.dec_stopProcessTimeOut(int_secondesLimit = 10, returnIfTimeOut = False)
     def function_TO_DECORATE(*args, **kwarks):
     ''' This decorators allow to stop a process if it is too long
-    For example, testing a folder existence might be very very long...
-    '''
+        For example, testing a folder existence might be very very long...
+        '''
     
 
 Temporary documentation for nutFiles :
@@ -180,37 +180,113 @@ Temporary documentation for nutFiles :
     
     if not fl.fBl_FolderExist_timeout(_path):
     """ Test if a folder exist. Giving a folder path, return a Boolean
-    The function is decorated not to search for more than 10 secondes """
+        The function is decorated not to search for more than 10 secondes """
     
     fl.TrimTxtFile(str_path, bl_right = True)
     """ This function will Trim the space in a text file
-    We can decide to Trim only the space on the left or right 
-    By default, the Trim is both side"""
+        We can decide to Trim only the space on the left or right 
+        By default, the Trim is both side"""
     
     fl.Act_Rename(str_newFolder, str_oldName, str_newName, False)
     """ Renaming a file and if it failed using the lib os, it will MOVE the file with shutil """
     
     newName = fl.fStr_TransformFilName_fromXXX_forGlobFunction(fileName, bl_exactNumberX = False)
     """ Change a string with unknown characters (XXXX) into sth understandable by the glob library
-    'file_{*}_1.zip' ==> 'file_*_1.zip'     ( bl_exactNumberX = False)
-    'file_{XXXX}_1.zip' ==> 'file_????.zip' ( bl_exactNumberX = True)
-    'file_{XXXX}.zip' ==> 'file_*.zip'      ( bl_exactNumberX = False)
-    """
+        'file_{*}_1.zip' ==> 'file_*_1.zip'     ( bl_exactNumberX = False)
+        'file_{XXXX}_1.zip' ==> 'file_????.zip' ( bl_exactNumberX = True)
+        'file_{XXXX}.zip' ==> 'file_*.zip'      ( bl_exactNumberX = False)
+        """
     
     L_filIn =   fl.fL_GetFileListInFolder(myFolder, fileName_X, bl_searchOnly, bl_exactNb)
     """ Return the list of files in a folder that match the pattern given of the fileName 
-    with {*} or {XXX} within """
+        with {*} or {XXX} within """
     
     fileName = fl.fStr_GetMostRecentFile_InFolder(folder, fileName_X)
     """ Return the list of files in a folder that match the pattern given of the fileName
-    with {*} or {XXX} within
-    AND take the most recent one"""
+        with {*} or {XXX} within
+        AND take the most recent one"""
     
     l_files_X = fl.fL_GetFileList_withinModel(l_files, str_fileName)
     """ If you have in memory a list of File Name
-    you want to return the list of those who match the pattern given of the fileName
-    with {*} or {XXX} within
-    """
+        you want to return the list of those who match the pattern given of the fileName
+        with {*} or {XXX} within"""
+    
+    dte_modif = fl.fDte_GetModificationDate(myPath)
+    """ Function Get the Modification Date of a file
+        Useful for Update of App """
+    
+    l_pathReturn = fl.fL_KeepFiles_wTimeLimit(l_files, dte_after = 100)
+    """ Filter a list of file Path to return the files that has been updated 
+        after X days in the past and before Y days in the past 
+        dte_after and dte_before can be date or integer of days in the past"""
+    
+    bl_creation = fl.fBl_createDir(myFolder)
+    """ Create a Directory
+        Return False if Directory exists, True if the folder has been created """
+    
+    o_file = fl.fO_readfile_parquet(str_pathFile, **d_options)
+    """ fO_readfile_parquet reads parquet - require the libraries : pyarrow / fastparquet
+        options: use_threads, engine='fastparquet', ... """
+    
+    str_sqlRequest = fl.fStr_ReadFile_sql(path)
+    """ fStr_ReadFile_sql Opens and read the file as a single buffer"""
+    
+    df_data = fl.fDf_readExcelWithPassword(path, SheetName, ExcelPwd, 'A1:M400')
+    """ You can read an Excel file protected with password - Requires to open the Excel App
+        Also, for performance issue (and in order not to open Excel App again)
+        it will create a csv copy named: fileName_sheetName.csv 
+        Once the csv created, the same function will only use |pd.read_csv()|
+        Return a Dataframe"""
+    
+    d_data = fl.fDic_readExcelWithPassword_sevSh(path, ExcelPwd, d_shName_areaToLoad)
+    """ You can read an Excel file protected with password - Requires to open the Excel App
+        Also, for performance issue (and in order not to open Excel App again)
+        it will create 1 CSV per sheet in the spredsheet named: fileName_sheetName.csv
+        Once all the csv created, the same function will only use |pd.read_csv()|
+        Return a sictionary of Dataframe, key will be the SheetNames
+        """
+    
+    df_data = pd_read_excel(str_path, str_SheetName, bl_header)
+    """ To be able to read xlsx files with the function: |pd.read_excel|
+        You need to have a previous xlrd version (xlrd==1.2.0)
+        And replace the file xlsx.py (/Lib/site-packages/xlrd) by the one in this library !!!
+        If it fails the engine openxyl will be used
+        You can pass a sheet_name and a header as input
+        """
+    
+    fl.fStr_createExcel_1Sh(path, '', df_PCF, str_SheetName = '', bl_header = False)
+    """ Create a single sheet Excel file"""
+    
+    fl.fStr_createExcel_SevSh(path, '', l_dfData, l_SheetName, bl_header = True)
+    """ Create a several sheets Excel file, Input is a list of Dataframe
+        Will use pd.ExcelWriter and will no return any error depending of the version of xlrd
+        if |options = d_options| wont work, |engine_kwargs = {'options' : d_options}| will be tried as well
+        """
+    
+    fl.fStr_createExcel_SevSh_celByCel(path, '', l_dfData, l_SheetName)
+    """ Create a several sheets Excel file
+        Input is a list of Dataframe and list of Sheet Names
+        Will use xlsxwriter and fill the Excel Cell by Cell
+        Performance may be pretty low
+        Preferable to use the function : fStr_createExcel_SevSh
+        """
+    
+    fl.fStr_fillExcel_InsertNewSheet(path, '', df_data, str_SheetName)
+    """ Take an existing  Excel file and insert a new sheet
+        Input is a list of Dataframe - Will use pd.ExcelWriter 
+        INSERT SHEET: 1 file out - 1 Dataframe - 1 Sheet """
+    
+    fl.fStr_fillXls_df_xlWgs_sevSh(folder, FileName, l_dfData, l_SheetName = l_shName)
+    """ Take an existing Excel file and an existing sheet and fill it with new data
+        Input is a Dataframe - Will use c_xlApp_xlwings class
+        1 file out - 1 Dataframe - 1 Sheet"""
+    
+    str_path = fl.fStr_fillXls_df_xlWgs_sevSh(folder, FileName, l_dfData, l_SheetName = l_shName)
+    """ Take an existing Excel file and several existing sheet and fill it with new data
+        Input is a list of Dataframe, SheetNames - Will use c_win32_xlApp class
+        1 fileout - n Dataframe - n Sheet"""
+    
+    xxx
     
     
     
@@ -218,3 +294,4 @@ Temporary documentation for nutFiles :
     
     
     
+***END***

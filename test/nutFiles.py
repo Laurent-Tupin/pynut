@@ -359,11 +359,14 @@ def fL_GetFileList_withinModel(L_FileName, str_fileName_withX):
 # Files Date
 #------------------------------------------------------------------------------ 
 def fDte_GetModificationDate(str_pathFile):
+    """ Function Get the Modification Date of a file
+    Useful for Update of App
+    """
     try:
         if fBl_FileExist(str_pathFile):
             dte_modif = os.path.getmtime(str_pathFile)
-            # dte_modif = dt.datetime.fromtimestamp(dte_modif)
-            dte_modif = dat.fDte_formatToTimeStamp(dte_modif)
+            # dte_modif = dat.fDte_formatToTimeStamp(dte_modif)
+            dte_modif = dt.datetime.fromtimestamp(dte_modif)
         else:
             print('  fDte_GetModificationDate: File does not exist: ')
             print('  - str_pathFile: ', str_pathFile)
@@ -376,6 +379,10 @@ def fDte_GetModificationDate(str_pathFile):
 
 
 def fL_KeepFiles_wTimeLimit(l_pathFile, dte_after = 10, dte_before = 0):
+    """ Filter a list of file Path to return the files that has been updated
+    after X days in the past and before Y days in the past
+    dte_after and dte_before can be date or integer of days in the past
+    """
     # Parameters in
     if type(dte_after) == int:
         dte_after = fDte_datePast(dte_after)
@@ -385,9 +392,9 @@ def fL_KeepFiles_wTimeLimit(l_pathFile, dte_after = 10, dte_before = 0):
     # Keep file in list within the Limit Date
     try:
         l_pathReturn = [path for path in l_pathFile if fBl_FileExist(path)]
-        l_pathReturn = [path for path in l_pathReturn if dt.datetime.fromtimestamp(os.path.getmtime(path)) > dte_after]
+        l_pathReturn = [path for path in l_pathReturn if fDte_GetModificationDate(path) > dte_after]
         if dte_before != 0:
-            l_pathReturn = [path for path in l_pathReturn if dt.datetime.fromtimestamp(os.path.getmtime(path)) <= dte_before]
+            l_pathReturn = [path for path in l_pathReturn if fDte_GetModificationDate(path) <= dte_before]
     except Exception as err:
         print(' ERROR in fL_KeepFiles_wTimeLimit: |{}|'.format(str(err)))
         raise
@@ -399,6 +406,8 @@ def fL_KeepFiles_wTimeLimit(l_pathFile, dte_after = 10, dte_before = 0):
 # CREATE
 #-----------------------------------------------------------------
 def fBl_createDir(str_folder):
+    """ Create a Directory
+    Return False if Directory exists, True if the folder has been created """
     try:
         if os.path.exists(str_folder):
             return False    # Folder already exist
@@ -550,6 +559,12 @@ def fStr_readFile(bl_folderRelative, str_folder, str_fileName = 'test.txt'):
     return str_return
     
 def fDf_readExcelWithPassword(str_path, str_SheetName, str_ExcelPassword, str_areaToLoad = ''):
+    """ You can read an Excel file protected with password - Requires to open the Excel App
+        Also, for performance issue (and in order not to open Excel App again)
+        it will create a csv copy named: fileName_sheetName.csv
+        Once the csv created, the same function will only use |pd.read_csv()|
+        Return a Dataframe
+        """
     # Create the CSV Name
     l_pathCSV = str_path.split('.')
     str_pathCsv = '.'.join(l_pathCSV[:-1]) + '_' + str_SheetName + '.csv'
@@ -579,6 +594,12 @@ def fDf_readExcelWithPassword(str_path, str_SheetName, str_ExcelPassword, str_ar
     return df_data
     
 def fDic_readExcelWithPassword_sevSh(str_path, str_ExcelPassword, d_shName_areaToLoad = {}):
+    """ You can read an Excel file protected with password - Requires to open the Excel App
+        Also, for performance issue (and in order not to open Excel App again)
+        it will create 1 CSV per sheet in the spredsheet named: fileName_sheetName.csv
+        Once all the csv created, the same function will only use |pd.read_csv()|
+        Return a sictionary of Dataframe, key will be the SheetNames
+        """
     d_data = {}
     # Create the CSV Name
     d_pathCsv = {sh : '.'.join(str_path.split('.')[:-1]) + '_' + sh + '.csv' for sh in d_shName_areaToLoad.keys()}
@@ -633,9 +654,12 @@ def fDic_readExcelWithPassword_sevSh(str_path, str_ExcelPassword, d_shName_areaT
 # READ XLS / XLSX Files
 #-----------------------------------------------------------------
 def pd_read_excel(str_path, str_SheetName = '', bl_header = None):
-    ''' To be able to read xlsx files with the function: |pd.read_excel|
-    You need to have a previous xlrd version (xlrd==1.2.0)
-    And replace the file xlsx.py (/Lib/site-packages/xlrd) by the one in this library !!!'''
+    """ To be able to read xlsx files with the function: |pd.read_excel|
+        You need to have a previous xlrd version (xlrd==1.2.0)
+        And replace the file xlsx.py (/Lib/site-packages/xlrd) by the one in this library !!!
+        If it fails the engine openxyl will be used
+        You can pass a sheet_name and a header as input
+        """
     try:
         if str_SheetName == '':     df_data = pd.read_excel(str_path, header = bl_header)
         else:                       df_data = pd.read_excel(str_path, header = bl_header, sheet_name = str_SheetName)
@@ -676,6 +700,7 @@ def OpenSaveXls_xlWing(str_path):
     return True
 
 def fStr_createExcel_1Sh(str_folder, str_FileName, df_Data, str_SheetName = '', bl_header = False):
+    """ Create a single sheet Excel file"""
     try:
         # Define Path
         str_path = fStr_BuildPath(str_folder, str_FileName)
@@ -690,6 +715,11 @@ def fStr_createExcel_1Sh(str_folder, str_FileName, df_Data, str_SheetName = '', 
     return str_path
 
 def fStr_createExcel_SevSh(str_folder, str_FileName, l_dfData, l_SheetName = [], bl_header = False, d_options = {}):
+    """ Create a several sheets Excel file
+    Input is a list of Dataframe
+    Will use pd.ExcelWriter and will no return any error depending of the version of xlrd
+    if |options = d_options| wont work, |engine_kwargs = {'options' : d_options}| will be tried as well
+    """
     try:
         # Define Path
         str_path = fStr_BuildPath(str_folder, str_FileName)
@@ -706,7 +736,6 @@ def fStr_createExcel_SevSh(str_folder, str_FileName, l_dfData, l_SheetName = [],
     return str_path
 
 def fStr_createExcel_SevSh_options(str_path, l_dfData, l_SheetName = [], bl_header = False, d_options = {}):
-    '''This function is for previous xlrd version (xlrd==1.2.0)'''
     try:
         #options={'strings_to_numbers': True}
         with pd.ExcelWriter(str_path, engine = 'xlsxwriter', options = d_options) as xl_writer:
@@ -738,7 +767,13 @@ def fStr_createExcel_SevSh_engine_kwargs(str_path, l_dfData, l_SheetName = [], b
     return str_path
 
 
-def fStr_createExcel_SevSh_celByCel(str_folder, str_FileName, l_dfData, l_SheetName = [], bl_header = False):
+def fStr_createExcel_SevSh_celByCel(str_folder, str_FileName, l_dfData, l_SheetName = []):
+    """ Create a several sheets Excel file
+    Input is a list of Dataframe and list of Sheet Names
+    Will use xlsxwriter and fill the Excel Cell by Cell
+    Perfromance may be pretty low
+    Preferable to use the function : fStr_createExcel_SevSh
+    """
     try:
         # Define Path
         if str_FileName == '':      str_path = str_folder
@@ -772,6 +807,9 @@ def fStr_createExcel_SevSh_celByCel(str_folder, str_FileName, l_dfData, l_SheetN
 
 # INSERT SHEET: 1 file out - 1 Dataframe - 1 Sheet 
 def fStr_fillExcel_InsertNewSheet(str_folder, str_FileName, df_data, str_SheetName = '', bl_header = False):
+    """ Take an existing  Excel file and insert a new sheet
+    Input is a list of Dataframe - Will use pd.ExcelWriter
+    """
     try:
         if str_FileName == '':  str_path = str_folder
         else:                   str_path = os.path.join(str_folder, str_FileName)
@@ -798,6 +836,62 @@ def fStr_fillExcel_InsertNewSheet(str_folder, str_FileName, df_data, str_SheetNa
         print('  - str_SheetName', str_SheetName)
         return False
     return str_path
+
+
+# 1 file out - 1 Dataframe - 1 Sheet
+def fStr_fillXls_celByCel(str_path, df_data, str_SheetName='', xlWs=0, int_nbRows=0, int_rowsWhere=1):
+    """ Take an existing Excel file and an existing sheet and fill it with new data
+    Input is a list of Dataframe - Will use c_win32_xlApp class"""
+    try:
+        # If Sheet is nothing, we must define it
+        if xlWs == 0:
+            bl_CloseExcel = True
+            inst_xlApp = c_win32_xlApp()
+            inst_xlApp.FindXlApp(bl_visible=False)
+            inst_xlApp.OpenWorkbook(str_path)
+            xlWs = inst_xlApp.DefineWorksheet(str_SheetName, 1)
+            if not xlWs:        print('  (--) ERROR in fStr_fillXls_celByCel: really could not find the sheet')
+        else:
+            bl_CloseExcel = False
+
+        # ------ Insert or delete ROWS ------
+        if int_nbRows > 0:
+            for i in range(0, int_nbRows):      xlWs.Rows(int_rowsWhere).EntireRow.Insert()
+        elif int_nbRows < 0:
+            for i in range(0, -int_nbRows):     xlWs.Rows(int_rowsWhere).EntireRow.Delete()
+            # ------ Fill Cell by Cell  ------
+        for i, row in enumerate(df_data.index):
+            for j, col in enumerate(df_data.columns):
+                xlWs.Cells(i + 1, j + 1).Value = str(df_data.iat[i, j])
+    except Exception as err:
+        print('  ERROR in fl.fStr_fillXls_celByCel: Could not fill  Excel | {}'.format(str(err)))
+        print('  - str_path : ', str_path)
+        print('  - str_SheetName : ', str_SheetName)
+        try:
+            print('  - int_nbRows : ', int_nbRows, 'int_rowsWhere: ', int_rowsWhere)
+            print('  - i : ', i, 'row: ', row)
+            print('  - j : ', j, 'col: ', col)
+            print('  - str(df_data.iat[i, j])', str(df_data.iat[i, j]))
+            print('  - xlWs.Cells(i+1, j+1).Value', xlWs.Cells(i + 1, j + 1).Value)
+        except:
+            pass
+        return False
+    # rustine depending where Function start
+    if bl_CloseExcel:
+        try:
+            inst_xlApp.Visible = True
+        except Exception as err:
+            print('  ERROR in fl.fStr_fillXls_celByCel: xlApp visible did not work | {}'.format(str(err)))
+        try:
+            inst_xlApp.CloseWorkbook(True)
+        except Exception as err:
+            print('  ERROR in fl.fStr_fillXls_celByCel: Excel workbook could not be closed | {}'.format(str(err)))
+        try:
+            inst_xlApp.QuitXlApp(bl_force=False)
+        except Exception as err:
+            print('  ERROR: Excel could not be closed | {}'.format(str(err)))
+    return str_path
+
 
 
 # 1 file out - n Dataframe - n Sheet
@@ -844,53 +938,56 @@ def fStr_fillXls_celByCel_plsSheets(str_folder,str_FileName,l_dfData,l_SheetName
         return False
     return str_path
 
+
 # 1 file out - 1 Dataframe - 1 Sheet
-def fStr_fillXls_celByCel(str_path, df_data, str_SheetName = '', xlWs = 0, int_nbRows = 0, int_rowsWhere = 1):
+def fStr_fillXls_df_xlWgs(str_path, df_data, str_SheetName='', xl_sheet=0, int_nbRows=0, int_rowsWhere=1):
+    """ Take an existing Excel file and an existing sheet and fill it with new data
+    Input is a Dataframe - Will use c_xlApp_xlwings class"""
     try:
+        inst_xlWings = c_xlApp_xlwings()
+
         # If Sheet is nothing, we must define it
-        if xlWs == 0:
-            bl_CloseExcel = True
-            inst_xlApp = c_win32_xlApp()
-            inst_xlApp.FindXlApp(bl_visible = False)
-            inst_xlApp.OpenWorkbook(str_path)
-            xlWs = inst_xlApp.DefineWorksheet(str_SheetName, 1)
-            if not xlWs:        print('  (--) ERROR in fStr_fillXls_celByCel: really could not find the sheet')
-        else:   bl_CloseExcel = False
-             
+        if xl_sheet == 0:
+            bl_CloseExcel = True  # We do not close the workbook if we need to fill several Sheet
+            inst_xlWings.FindXlApp(bl_visible=True, bl_screen_updating=False, bl_display_alerts=False)
+            inst_xlWings.OpenWorkbook(str_path)
+            xl_sheet = inst_xlWings.DefineWorksheet(str_SheetName, 1)
+            if not xl_sheet:        print('  (--) ERROR in fStr_fillXls_celByCel: really could not find the sheet')
+        else:
+            bl_CloseExcel = False
+            inst_xlWings.xl_lastSheet = xl_sheet
+
         # ------ Insert or delete ROWS ------
         if int_nbRows > 0:
-            for i in range(0, int_nbRows):      xlWs.Rows(int_rowsWhere).EntireRow.Insert()
+            for i in range(0, int_nbRows):      xl_sheet.range("{0}:{0}".format(str(int_rowsWhere))).api.Insert()
         elif int_nbRows < 0:
-            for i in range(0, -int_nbRows):     xlWs.Rows(int_rowsWhere).EntireRow.Delete()                    
-        # ------ Fill Cell by Cell  ------
-        for i, row in enumerate(df_data.index):
-            for j, col in enumerate(df_data.columns):	
-                xlWs.Cells(i+1, j+1).Value = str(df_data.iat[i, j])
+            for i in range(0, -int_nbRows):     xl_sheet.range("{0}:{0}".format(str(int_rowsWhere))).api.Delete()
+        # ------ Fill DF------
+        inst_xlWings.InsertDf_inRange(df_data)
+        # Close if only one sheet
+        if bl_CloseExcel:
+            try:
+                inst_xlWings.close_Book(bl_saveBeforeClose=True)
+            except Exception as err:
+                print('  ERROR in fl.fStr_fillXls_df_xlWgs: close_Book | {}'.format(str(err)))
     except Exception as err:
-        print('  ERROR in fl.fStr_fillXls_celByCel: Could not fill  Excel | {}'.format(str(err)))
+        print('  ERROR in fl.fStr_fillXls_df_xlWgs | {}'.format(str(err)))
         print('  - str_path : ', str_path)
         print('  - str_SheetName : ', str_SheetName)
+        print('  - int_nbRows : ', int_nbRows, 'int_rowsWhere: ', int_rowsWhere)
         try:
-            print('  - int_nbRows : ', int_nbRows, 'int_rowsWhere: ', int_rowsWhere)
-            print('  - i : ', i, 'row: ', row)
-            print('  - j : ', j, 'col: ', col)
-            print('  - str(df_data.iat[i, j])', str(df_data.iat[i, j]))
-            print('  - xlWs.Cells(i+1, j+1).Value', xlWs.Cells(i+1, j+1).Value)
-        except:     pass
+            inst_xlWings.visible = True
+            inst_xlWings.screen_updating = True
+            inst_xlWings.display_alerts = True
+        except:
+            print('  ERROR in fStr_fillXls_df_xlWgs: visible & Cie did not work')
         return False
-    # rustine depending where Function start
-    if bl_CloseExcel:
-        try:                        inst_xlApp.Visible = True
-        except Exception as err:    print('  ERROR in fl.fStr_fillXls_celByCel: xlApp visible did not work | {}'.format(str(err)))
-        try:                        inst_xlApp.CloseWorkbook(True)
-        except Exception as err:    print('  ERROR in fl.fStr_fillXls_celByCel: Excel workbook could not be closed | {}'.format(str(err)))
-        try:                        inst_xlApp.QuitXlApp(bl_force = False)
-        except Exception as err:    print('  ERROR: Excel could not be closed | {}'.format(str(err)))
     return str_path
 
-
-# 1 file out - n Dataframe - n Sheet
+# # 1 fileout - n Dataframe - n Sheet
 def fStr_fillXls_df_xlWgs_sevSh(str_folder, str_FileName, l_dfData, l_SheetName = [], l_nbRows = [], l_rowsWhere = []):
+    """ Take an existing Excel file and several existing sheet and fill it with new data
+    Input is a list of Dataframe, SheetNames - Will use c_win32_xlApp class"""
     try:
         str_path = fStr_BuildPath(str_folder, str_FileName)
         # Open the file (win32)
@@ -931,45 +1028,9 @@ def fStr_fillXls_df_xlWgs_sevSh(str_folder, str_FileName, l_dfData, l_SheetName 
     return str_path
 
 
-# 1 file out - 1 Dataframe - 1 Sheet
-def fStr_fillXls_df_xlWgs(str_path, df_data, str_SheetName = '', xl_sheet = 0, int_nbRows = 0, int_rowsWhere = 1):
-    try:
-        inst_xlWings = c_xlApp_xlwings()
-        
-        # If Sheet is nothing, we must define it
-        if xl_sheet == 0:
-            bl_CloseExcel = True    # We do not close the workbook if we need to fill several Sheet
-            inst_xlWings.FindXlApp(bl_visible = True, bl_screen_updating = False, bl_display_alerts = False)
-            inst_xlWings.OpenWorkbook(str_path)
-            xl_sheet = inst_xlWings.DefineWorksheet(str_SheetName, 1)
-            if not xl_sheet:        print('  (--) ERROR in fStr_fillXls_celByCel: really could not find the sheet')
-        else:   
-            bl_CloseExcel = False
-            inst_xlWings.xl_lastSheet = xl_sheet
-        
-        # ------ Insert or delete ROWS ------
-        if int_nbRows > 0:
-            for i in range(0, int_nbRows):      xl_sheet.range("{0}:{0}".format(str(int_rowsWhere))).api.Insert()
-        elif int_nbRows < 0:
-            for i in range(0, -int_nbRows):     xl_sheet.range("{0}:{0}".format(str(int_rowsWhere))).api.Delete()
-        # ------ Fill DF------
-        inst_xlWings.InsertDf_inRange(df_data)
-        # Close if only one sheet
-        if bl_CloseExcel:
-            try:                        inst_xlWings.close_Book(bl_saveBeforeClose = True)
-            except Exception as err:    print('  ERROR in fl.fStr_fillXls_df_xlWgs: close_Book | {}'.format(str(err)))
-    except Exception as err:
-        print('  ERROR in fl.fStr_fillXls_df_xlWgs | {}'.format(str(err)))
-        print('  - str_path : ', str_path)
-        print('  - str_SheetName : ', str_SheetName)
-        print('  - int_nbRows : ', int_nbRows, 'int_rowsWhere: ', int_rowsWhere)
-        try: 		
-            inst_xlWings.visible = True
-            inst_xlWings.screen_updating = True
-            inst_xlWings.display_alerts = True
-        except: 	print('  ERROR in fStr_fillXls_df_xlWgs: visible & Cie did not work')
-        return False
-    return str_path
+
+
+
 
 def fTup_GetLastRowCol(xl_sh, int_rowStart = 1, int_colStart = 1):
     int_row = int_rowStart

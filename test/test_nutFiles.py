@@ -1,4 +1,5 @@
 import os
+import datetime
 import pytest
 try:
     import nutFiles as fl
@@ -133,5 +134,33 @@ def test_fL_GetFileList_withinModel_empty(fileName_X):
     l_files = fl.fL_listFile(myFolder)
     l_files_X = fl.fL_GetFileList_withinModel(l_files, fileName_X)
     assert (len(l_files_X) == 0)
+
+def test_fDte_GetModificationDate():
+    myPath = fl.fStr_myPath(__file__) + '\\' + fl.fStr_myFileName(__file__)
+    dte_modif = fl.fDte_GetModificationDate(myPath)
+    # print(dte_modif)
+    # print(type(dte_modif))
+    # print(isinstance(dte_modif, datetime.datetime))
+    # assert (isinstance(dte_modif, datetime.datetime))
+
+def test_fL_KeepFiles_wTimeLimit():
+    myFolder = fl.fStr_myPath(__file__)
+    l_files = fl.fL_listFile(myFolder)
+    l_pathReturn = fl.fL_KeepFiles_wTimeLimit(l_files, dte_after = 100_000)
+    assert (isinstance(l_pathReturn, list))
+    assert(len(l_pathReturn) > 0)
+    l_pathEmpty = fl.fL_KeepFiles_wTimeLimit(l_files, dte_after=-1)
+    # print('l_pathEmpty', l_pathEmpty)
+    # print(len(l_pathEmpty))
+    assert (isinstance(l_pathEmpty, list))
+    assert (l_pathEmpty == [])
+
+def test_fBl_createDir():
+    myFolder = fl.fStr_myPath(__file__)
+    bl_creation = fl.fBl_createDir(myFolder)
+    assert (bl_creation is False)
+    # We wont create a folder for a Unit Test
+
+
 
 
