@@ -286,9 +286,26 @@ Temporary documentation for nutFiles :
         Input is a list of Dataframe, SheetNames - Will use c_win32_xlApp class
         1 fileout - n Dataframe - n Sheet"""
     
-    xxx
+    Act_win32_SaveAsCleanFile(path, pathNew)
+    """ Sometimes an Excel file is an old version and might be corrupted
+        By Passing your file through this function, Excel App will be open, SaveAs and Close 
+        so the new File will be useable by Python after"""
     
+    df_donnee = fl.fDf_convertToXlsx(path, SheetName, bl_header = None)
+    """ Will use Act_win32_SaveAsCleanFile to make sure the file is not corrupted
+        and SaveAs XLSX instead of XLS 
+        Read it and return the dataframe """
+        
+    df_donnee = fl.fDf_overwriteXlsx(path, SheetName, bl_header = None)
+    """ Will use Act_win32_SaveAsCleanFile to save a non-corrupted XLSX file 
+        Read it and return the dataframe """
     
+    fl.Act_convertToXls_fromXlsx(path)
+    """ Will use Act_win32_SaveAsCleanFile to make sure the file is not corrupted
+        and SaveAs XLS instead of XLSX """
+    
+    fl.Act_win32OConvertXls_pdf(path)
+    """ Will open an Excel file and convert it into PDF"""
     
     
     

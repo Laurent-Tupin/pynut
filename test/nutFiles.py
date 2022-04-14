@@ -1089,6 +1089,9 @@ def Act_CopySheetExcel_fomCsv(str_pathWkDest, l_PathWkOrigin, l_SheetName = []):
 # CONVERT XLS File 
 #-----------------------------------------------------------------
 def fDf_convertToXlsx(str_path, str_SheetName = '', bl_header = None):
+    """ Will use Act_win32_SaveAsCleanFile to make sure the file is not corrupted
+    and SaveAs XLSX instead of XLS
+    Read it and return the dataframe """
     if '.xlsx' == str_path.lower()[-5:]:
         str_pathNew = str_path
     else:
@@ -1100,6 +1103,8 @@ def fDf_convertToXlsx(str_path, str_SheetName = '', bl_header = None):
     return df_data
 
 def fDf_overwriteXlsx(str_path, str_SheetName = '', bl_header = None):
+    """ Will use Act_win32_SaveAsCleanFile to save a non-corrupted XLSX file
+    Read it and return the dataframe """
     str_pathNew = str_path.replace('.xlsx', '_clean.xlsx').replace('.XLSX', '_clean.xlsx')    
     # Open Excel and Save as a XLSX version
     Act_win32_SaveAsCleanFile(str_path, str_pathNew)
@@ -1108,12 +1113,16 @@ def fDf_overwriteXlsx(str_path, str_SheetName = '', bl_header = None):
     return df_data
     
 def Act_convertToXls_fromXlsx(str_path):
-    str_pathNew = str_path.replace('.xlsx', '.xls').replace('.XLSX', '.xls')    
+    """ Will use Act_win32_SaveAsCleanFile to make sure the file is not corrupted
+    and SaveAs XLS instead of XLSX """
+    str_pathNew = str_path.replace('.xlsx', '.xls').replace('.XLSX', '.xls')
     # Open Excel and Save as a XLSX version
     print('  (*) Copying XLSX file into XLS: {} \n'.format(str_pathNew.split('Auto_py')[-1]))
     Act_win32_SaveAsCleanFile(str_path, str_pathNew)
 
 def Act_win32_SaveAsCleanFile(str_path, str_pathNew):
+    """ Sometimes an Excel file is an old version and might be corrupted
+    By Passing your file through this function, Excel App will be open, SaveAs and Close so the new File will be useable"""
     # Test if file exist
     if not fBl_FileExist(str_pathNew):
         try:
@@ -1134,6 +1143,7 @@ def Act_win32_SaveAsCleanFile(str_path, str_pathNew):
     return True
 
 def Act_win32OConvertXls_pdf(str_path):
+    """ Will open an Excel file and convert it into PDF"""
     print('  (*) Converting XLSX file into PDF: {} \n'.format(str_path.split('Auto_py')[-1]))
     inst_xlApp = c_win32_xlApp()
     inst_xlApp.FindXlApp(bl_visible = False)
