@@ -2,8 +2,12 @@ try:
     from . import _lib as lib
     from . import nutOther as oth
 except:
-    import _lib as lib
-    import nutOther as oth
+    try:
+        import _lib as lib
+        import nutOther as oth
+    except:
+        from pyNut import _lib as lib
+        from pyNut import nutOther as oth
 os          = lib.os()
 time        = lib.time()
 pd          = lib.pandas()
@@ -12,11 +16,10 @@ requests    = lib.requests()
 # from urllib.request import urlopen, urlretrieve
 BeautifulSoup = lib.BeautifulSoup()
 unicodedata = lib.unicodedata()
-selenium    = lib.selenium()
-# from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.webdriver.common.by import By
-# from selenium.webdriver.common.keys import Keys
-# from selenium.webdriver.support import expected_conditions as EC
+try:
+    selenium_webdriver = lib.selenium_webdriver()
+except:
+    from selenium import webdriver as selenium_webdriver
 
 
 
@@ -24,6 +27,7 @@ selenium    = lib.selenium()
 #------------- CLASS API ----------------------------
 #---------------------------------------------------------------
 class C_API:
+    """ The class allows the user to read an URL and get back a dataframe from JSON format"""
     def __init__(self, d_auth={}, d_headers={}):
         # d_headers = {'User-Agent': 'Chrome/71.0.3578.98'}
         # d_headers = {"User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) Safari/605.1.15",
@@ -162,13 +166,23 @@ class C_API:
         return df_return
 #______________________________________________________________________________
 
+
 #@oth.dec_singletonsClass
 class C_API_simple(C_API):
+    """ The class inherit from C_API
+        allows the user to read an URL and get back a dataframe from JSON format
+    Is decorated to be a singleton"""
     def __init__(self, d_auth={}, d_headers={}):
         super().__init__(d_auth, d_headers)
 
+
 #@oth.dec_singletonsClass
 class C_API_checkIndex(C_API):
+    """ The class inherit from C_API
+            allows the user to read an URL and get back a dataframe from JSON format
+        Is decorated to be a singleton
+        Check Data within
+        """
     def __init__(self, d_auth={}, d_headers={}):
         super().__init__(d_auth, d_headers)
     def api_con_Check(self, str_url, bl_raiseErrorIfNoPage = True, bl_verify = True, d_check = {}):
@@ -208,6 +222,7 @@ class C_API_checkIndex(C_API):
         else:
             return True
 #______________________________________________________________________________
+
 
 
 
@@ -258,8 +273,6 @@ def fBL_checkConnexion(o_page):
     except: 
         print('  ERROR in fBL_checkConnexion: Connexion fails because the input is not a page')
     return False
-
-
 
 
 
@@ -340,21 +353,21 @@ def fDf_htmlGetArray_Soup(str_url, bl_th = False, bl_waitForTranslation = False,
 #==============================================================================
 # SELENIUM
 #==============================================================================
-class c_Selenium_InteractInternet():
-    # ----------------------------------------------------
+class c_Selenium_InteractInternet:
+    #----------------------------------------------------
     # To use Chrome Driver
     #  Go to chromedriver.chromium.org
     #  download and UnZip the folder
-    #  Move it to Users/local/bin or C:\ProgramData\Anaconda3\Library\bin (Windows)
-    # ----------------------------------------------------
+    #  Move it to Users/local/bin
+    #----------------------------------------------------
     def __init__(self, str_url):
         o_options = self.getOptions_stopMessage()
-        self.driver = selenium.webdriver.Chrome(options = o_options)
+        self.driver = selenium_webdriver.Chrome(options = o_options)
         self.driver.get(str_url)
         self.realButtonName = ''
         
     def getOptions_stopMessage(self):
-        options = selenium.webdriver.ChromeOptions()
+        options = selenium_webdriver.ChromeOptions()
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
         return options
         
@@ -368,11 +381,11 @@ class c_Selenium_InteractInternet():
         return btn_click
    
     def clic(self, str_buttonName, str_buttonxPath, l_buttonIfFailed):
-        # ----------------------------------------------------
+        #----------------------------------------------------
         # Right click on the button and chose Inspect
         # Spot the button Type
         # Right Click and Copy XPath, You get the XPATH
-        # ----------------------------------------------------
+        #----------------------------------------------------
         btn_click = self.findElementByXpath(str_buttonxPath)
         realButtonName = str(btn_click.text)
         self.realButtonName = realButtonName
@@ -410,7 +423,6 @@ class c_Selenium_InteractInternet():
         try:                        self.driver.quit()
         except Exception as err:    print(' WARNING: selenium could not quit: {}'.format(err))
 
-
 def selenium_clicLaunch(str_url, str_buttonxPath, str_buttonName):
     try:
         inst_sel = c_Selenium_InteractInternet(str_url)
@@ -425,6 +437,3 @@ def selenium_clicLaunch(str_url, str_buttonxPath, str_buttonName):
         try:    inst_sel.sel_quit()
         except: pass
         return False
-
-
-

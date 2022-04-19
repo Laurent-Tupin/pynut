@@ -370,6 +370,24 @@ Temporary documentation for nutFiles :
         The class is decorated to be a singleton so we always use the same instance of Excel
         """
     
+
+Temporary documentation for nutApi :
+
+    from pyNut import nutApi as Api
+        
+    1. Class
+    
+    inst_getAPI = Api.C_API_simple( (str_uid, str_pwd) )
+    inst_getAPI.api_connect_json( url )
+    inst_getAPI.api_returnDataFrame( l_url_keyword = ['data', 'price'] )
+    df_data = inst_getAPI.df_return
+    """ The class inherit from C_API 
+            allows the user to read an URL and get back a dataframe from JSON format
+        Is decorated to be a singleton"""
+    
+    
+    
+    
     
     
     
