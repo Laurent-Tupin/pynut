@@ -161,6 +161,12 @@ def test_fBl_createDir():
     assert (bl_creation is False)
     # We wont create a folder for a Unit Test
 
-
-
-
+def test_fBl_fileTooOld():
+    myPath = fl.fStr_myPath(__file__) + '\\' + fl.fStr_myFileName(__file__)
+    bl_tooOld = fl.fBl_fileTooOld(myPath, int_dayHisto=100_000)
+    assert (bl_tooOld is False)
+    bl_tooOld = fl.fBl_fileTooOld(myPath, int_dayHisto=-1)
+    assert (bl_tooOld is True)
+    myPath_noFile = fl.fStr_myPath(__file__) + '\\aaabbbccc.csv'
+    bl_tooOld = fl.fBl_fileTooOld(myPath_noFile, int_dayHisto=-1)
+    assert (bl_tooOld is False)
