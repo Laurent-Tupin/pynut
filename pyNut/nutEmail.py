@@ -460,8 +460,7 @@ class c_Webmail():
             str_outAcctName =   fl.fStr_GetUserEmail('@ihsmarkit.com')
         self.str_outAcctName =  str_outAcctName
         # Quick variables
-        str_sola =              str_outAcctName.split('@')[0]
-        self.str_ihsmarkit =    str_outAcctName.split('@')[-1]
+        self.str_emailEnd =     str_outAcctName.split('@')[-1]
         str_username =          str_outAcctName
         # Define the Credentials
         o_cred = Credentials(username = str_username, password = str_pwd)
@@ -470,21 +469,22 @@ class c_Webmail():
             o_Acct = Account(credentials = o_cred, primary_smtp_address = str_outAcctName, 
                              autodiscover = True, access_type = DELEGATE)
         except Exception as err:
-            print('\n INFO, we got an error (getAccount): |{}|'.format(err))
+            # print('\n INFO, we got an error (getAccount): |{}|'.format(err))
+            print('\n INFO, we got an error (getAccount)')
             o_Acct = self.getAccount_wConfig(o_cred)
         self.o_Acct = o_Acct
         return self.o_Acct
         
     def getAccount_wConfig(self, o_cred):
-        str_server = 'eumail.{}'.format(self.str_ihsmarkit)
+        str_server = 'http://eumail.{}'.format(self.str_emailEnd)
         print('  *** Account did not directly, we need to define the server: |{}| in a config obj'.format(str_server))
         try:
             o_config = Configuration(credentials = o_cred, server = str_server)
             o_Acct = Account(config = o_config, primary_smtp_address = self.str_outAcctName, access_type = DELEGATE)
         except:
             print('  **** We need auth_type = NTLM')
-            o_config = Configuration(credentials = o_cred, service_endpoint = str_server, auth_type = 'NTLM')
-            o_Acct = Account(config = o_config, primary_smtp_address = self.str_outAcctName, access_type = DELEGATE)
+            o_config_NTLM = Configuration(credentials = o_cred, service_endpoint = str_server, auth_type = 'NTLM')
+            o_Acct = Account(config = o_config_NTLM, primary_smtp_address = self.str_outAcctName, access_type = DELEGATE)
         self.o_Acct = o_Acct
         return self.o_Acct
     
