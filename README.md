@@ -113,7 +113,7 @@ Temporary documentation for nutDataframe :
     df2 = dframe.dDf_fillNaColumn(df1, 'col2', 'col1')
     """ Replace Nan in a column by the value in another column or a Constant """
     
-    df2 = dframe.fDf_fillColUnderCondition(df1, 'NameColumnToApply', df1['data'], 'NameColumnCondition', 'YES', bl_except = False)
+    df2 = dframe.fDf_fillColUnderCondition(df1, 'NameColApply', df1['data'], 'NameColC', 'YES', bl_except = False)
     ''' Transform DF with condition
         ValueToApply can be a value or a lambda function'''   
     
@@ -147,6 +147,8 @@ Temporary documentation for nutOther :
 Temporary documentation for nutFiles :
 
     from pyNut import nutFiles as fl
+    
+    1. Functions
     
     fileName = fl.fStr_myFileName(__file__)
     ''' Get the Python File Name '''
@@ -306,6 +308,67 @@ Temporary documentation for nutFiles :
     
     fl.Act_win32OConvertXls_pdf(path)
     """ Will open an Excel file and convert it into PDF"""
+    
+    bl_tooOld = fl.fBl_fileTooOld(path, int_dayHisto = 10)
+    """ Return a boolean to know if a file is older than N days in the past """
+    
+    fl.del_fichier_ifOldEnought(path,'', int_dayToKeep = 10)
+    """ Check is a file is older than N days in the past 
+        And if so, delete it 
+        If the folder where the file is supposed to be does not exist, the function will create it"""
+    
+    fl.ZipExtractFile(ZipPath, pathDest, FileName, bl_extractAll=False, str_zipPassword='')
+    """ Will read a ZIP file and extract its content in a destination folder
+        It can take password
+        It can extract all or only a file"""
+    
+    fl.Act_StyleIntoExcel(path, format, sheetName)
+    """ Take an Excel Spreadsheet and a sheet and apply a format to it
+        str_format is a dictionary within a string,
+        the dictionary will be build by the fucntion eval
+        Example of format:
+            "{'A1:M500':{'font':{'name':'Calibri', 'size':9}},
+            'B3:B5':{'font':{'name':'Calibri', 'size':10, 'bold':True,'color':styl.colors.WHITE},
+                    'alignment':{'horizontal':'right'},
+                    'fill':{'patternType':'solid', 'fill_type':'solid', 'fgColor': 'F2F2F2'}},
+            'Column_size':{'A':50,'B':35,'C':10,'D':10,'E':15,'F':15,'G':18,'H':10},
+            'Table_bord':{'A3:A11':'normBlack', 'B3:B11':'normBlack'},
+            'Table_bord_full':{'A1:B1':'normBlack'},
+            'Table_bord_EndDown_full':{'A13':'normBlack'},
+            'num_format':{'B6:B6':'#,##0.0000', 'B7:B8':'#,##0'},
+            'num_format_col':{'G13':'#,##0.00',  'H13':'0.00%'}
+            }"
+        """
+        
+    Act_KillExcel()
+    """ This function kills all session of Excel
+        Including the 'ghost' session you would kill from the Task Manager """
+    
+    
+    2. Class
+    
+    inst_xlWings = c_xlApp_xlwings()
+    inst_xlWings.FindXlApp(bl_visible = True, bl_screen_updating = False, bl_display_alerts = False)
+    inst_xlWings.OpenWorkbook(path)
+    inst_xlWings.DefineWorksheet(SheetName, i + 1)
+    inst_xlWings.InsertDf_inRange(df_data)
+    inst_xlWings.close_Book(bl_saveBeforeClose = True)
+    """ The class allow you to manage excel with the library xlwings which might work better than win32
+        Open the Excel Office App, Close, Save, define / rename / create sheet, fill an area
+        The class is decorated to be a singleton so we always use the same instance of Excel
+        DOC: https://docs.xlwings.org/en/stable/api.html
+        """
+    
+    inst_xlApp = fl.c_win32_xlApp()
+    inst_xlApp.FindXlApp(bl_visible = True)
+    inst_xlApp.OpenWorkbook(str_path)
+    inst_xlApp.xlApp.DisplayAlerts = False
+    inst_xlApp.ConvertToPdf()
+    inst_xlApp.CloseWorkbook(bl_saveBeforeClose = True)
+    """ The class allow you to manage excel with the library win32com.client
+        Open the Excel Office App, Close, Save, define / rename / create sheet, fill an area
+        The class is decorated to be a singleton so we always use the same instance of Excel
+        """
     
     
     
