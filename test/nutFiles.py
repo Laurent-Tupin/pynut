@@ -400,6 +400,45 @@ def fL_KeepFiles_wTimeLimit(l_pathFile, dte_after = 10, dte_before = 0):
         raise
     return l_pathReturn
 
+def fBl_fileTooOld(str_path, int_dayHisto=5):
+    """ Return a boolean to know if a file is older than N days in the past """
+    try:
+        dte_delete = fDte_datePast(int_dayHisto)
+        dte_ModificationDate = fDte_GetModificationDate(str_path)
+        # File not exisiting
+        if dte_ModificationDate is False:
+            return False
+        elif dte_ModificationDate < dte_delete:
+            return True
+        else:
+            return False
+    except:
+        print(' ERROR in fBl_fileTooOld')
+        print(' - Parameters:', str_path, int_dayHisto)
+        raise
+    return False
+
+
+def del_fichier_ifOldEnought(str_folder, str_fileName, int_dayHisto=5):
+    """ Check is a file is older than N days in the past
+    And if so, delete it
+    If the folder where the file is supposed to be does not exist, the function will create it"""
+    # Build Path
+    if str_fileName == '':
+        str_path = str_folder
+        str_folder = '\\'.join(str_folder.split('\\')[:-1])
+    else:
+        str_path = os.path.join(str_folder, str_fileName)
+    # if folder does not exist : sortir de la fonction sans delete rien (et en ayant creer le dossier)
+    if fBl_createDir(str_folder):
+        print(' Information: Folder was not existing (in del_fichier_ifOldEnought): ', str_folder)
+        return False
+    # Boolean
+    bl_tooOld = fBl_fileTooOld(str_path, int_dayHisto)
+    # DELETE or not
+    if bl_tooOld:
+        os.remove(str_path)
+    return 0
 
 
 #-----------------------------------------------------------------
@@ -1030,8 +1069,6 @@ def fStr_fillXls_df_xlWgs_sevSh(str_folder, str_FileName, l_dfData, l_SheetName 
 
 
 
-
-
 def fTup_GetLastRowCol(xl_sh, int_rowStart = 1, int_colStart = 1):
     int_row = int_rowStart
     int_col = int_colStart
@@ -1157,6 +1194,7 @@ def Act_win32OConvertXls_pdf(str_path):
 # DELETE
 #------------------------------------------------------------------------------
 def del_fichier(str_folder, str_fileName = '', bl_ignoreErr = False):
+    """ Delete a file """
     try:
         if str_fileName == '':  str_path = str_folder
         else:                   str_path = os.path.join(str_folder, str_fileName)
@@ -1169,61 +1207,14 @@ def del_fichier(str_folder, str_fileName = '', bl_ignoreErr = False):
             raise
     return True
 
-def fBl_fileTooOld(str_path, int_dayHisto = 5):
-    try:
-        dte_delete = fDte_datePast(int_dayHisto)
-        dte_ModificationDate = fDte_GetModificationDate(str_path)
-        # File not exisiting
-        if dte_ModificationDate is False:
-            return False
-        elif dte_ModificationDate < dte_delete:
-            return True
-        else:   return False
-    except:
-        print(' ERROR in fBl_fileTooOld')
-        print(' - Parameters:', str_path, int_dayHisto)
-        raise
-    return False
-
-def del_fichier_ifOldEnought(str_folder, str_fileName, int_dayHisto = 5):
-    # Build Path
-    if str_fileName == '': 
-        str_path = str_folder
-        str_folder = '\\'.join(str_folder.split('\\')[:-1])
-    else:
-        str_path = os.path.join(str_folder, str_fileName)
-    # if folder does not exist : sortir de la fonction sans delete rien (et en ayant creer le dossier)
-    if fBl_createDir(str_folder):
-        print(' Information: Folder was not existing (in del_fichier_ifOldEnought): ', str_folder)
-        return False
-    # Boolean
-    bl_tooOld = fBl_fileTooOld(str_path, int_dayHisto)
-    # DELETE or not
-    if bl_tooOld:
-        os.remove(str_path)
-    return 0
-
-def del_allTxtFileInFolder_ifOldEnought(str_folder, int_dayHisto = 60):
-    try:
-        dte_delete = fDte_datePast(int_dayHisto)
-        l_fic = fList_FileInDir_Txt(str_folder)
-        for fic in l_fic:
-            str_path = os.path.join(str_folder, fic)
-            dte_modDate = fDte_GetModificationDate(str_path)
-            if dte_modDate is not False:
-                if dte_modDate < dte_delete:
-                    os.remove(str_path)
-    except Exception as err:
-        print(' ERROR in del_allTxtFileInFolder_ifOldEnought: |{}|'.format(err))
-        print(' - ', int_dayHisto, str_folder)
-        raise
-    return True    
-    
 
 #-----------------------------------------------------------------
 # ZIP
 #-----------------------------------------------------------------
 def ZipExtractFile(str_ZipPath, str_pathDest = '', str_FileName = '', bl_extractAll = False, str_zipPassword = ''):
+    """ Will read a ZIP file and extract its content in a destination folder
+    It can take password
+    It can extract all or only a file"""
     try:
         with ZipFile(str_ZipPath, 'r') as zipObj:
             if str_zipPassword != '':
@@ -1264,66 +1255,23 @@ def ZipExtractFile(str_ZipPath, str_pathDest = '', str_FileName = '', bl_extract
 #-----------------------------------------------------------------
 # FORMAT / STYLE
 #-----------------------------------------------------------------
-def fStr_StyleIntoExcel(str_path, str_SheetName = '', l_row = [1], str_styleName = 'Header_Perso',
-                        bl_bold = True, str_fontColor = '', l_Fill = [], l_border = []):
-    # Define EXCEL objects
-    xlWb = openpyxl.load_workbook(filename = str_path)
-    if str_SheetName == '':     xlWs = xlWb.active
-    else:                       xlWs = xlWb.Sheets(str_SheetName)
-    
-    # Define the Style
-    style_header = styl.NamedStyle(name = str_styleName)
-    # FONT
-    if str_fontColor == 'RED':      style_header.font = styl.Font(bold = bl_bold, color = styl.colors.RED)
-    elif str_fontColor == 'BLUE':   style_header.font = styl.Font(bold = bl_bold, color = styl.colors.BLUE)
-    elif str_fontColor == 'WHITE':  style_header.font = styl.Font(bold = bl_bold, color = styl.colors.WHITE)
-    elif str_fontColor != '':       style_header.font = styl.Font(bold = bl_bold, color = str_fontColor)
-    else:                           style_header.font = styl.Font(bold = bl_bold)
-    # FILL
-    if l_Fill:                      style_header.fill = styl.PatternFill(patternType = l_Fill[0],
-                                                                         fill_type = l_Fill[1], 
-                                                                         fgColor = l_Fill[2])
-    # TO convert the color, please use: https://convertingcolors.com/rgb-color-91_155_213.html
-    
-    # BORDER
-    if l_border: 
-        o_border = styl.Side(border_style = l_border[0], color = l_border[1])
-        style_header.border = styl.Border(top = o_border, right = o_border, bottom = o_border, left = o_border)
-    
-    # Save the Style in WK
-    try:        xlWb.add_named_style(style_header)
-    except:     print(' Information: The Style {} already exists in the workbook'.format(str_styleName))
-    
-    # Add Celle by Cell
-    if 'header' in str_styleName.lower():
-        for i_headerRow in l_row:
-            header_row = xlWs[i_headerRow]
-            for cell in header_row:
-                if cell.value != '' and cell.value != None:
-                    cell.style = str_styleName
-    elif 'table' in str_styleName.lower():
-        for i_row in l_row:
-            ROW = xlWs[i_row]
-            i_nbCol = 0
-            for cell in ROW:
-                if cell.value != '' and cell.value != None:
-                    i_nbCol += 1
-            for i_numRow in range(1, 1000):
-                ROW = xlWs[i_row + i_numRow]
-                str_firstCell = ROW[0].value
-                if str_firstCell != '' and str_firstCell != None:
-                    for cell in ROW[:i_nbCol]:
-                        cell.style = str_styleName
-                else:   break
-    # SAVE
-    xlWb.save(filename = str_path)
-    return str_path
-#----------------------------------------
-
-
-
-
 def Act_StyleIntoExcel(str_path, str_format = '', str_SheetName = ''):
+    """ Take an Excel Spreadsheet and a sheet and apply a format to it
+    str_format is a dictionary within a string,
+    the dictionary will be build by the fucntion eval
+    Example of format:
+        "{'A1:M500':{'font':{'name':'Calibri', 'size':9}},
+        'B3:B5':{'font':{'name':'Calibri', 'size':10, 'bold':True,'color':styl.colors.WHITE},
+                'alignment':{'horizontal':'right'},
+                'fill':{'patternType':'solid', 'fill_type':'solid', 'fgColor': 'F2F2F2'}},
+        'Column_size':{'A':50,'B':35,'C':10,'D':10,'E':15,'F':15,'G':18,'H':10},
+        'Table_bord':{'A3:A11':'normBlack', 'B3:B11':'normBlack'},
+        'Table_bord_full':{'A1:B1':'normBlack'},
+        'Table_bord_EndDown_full':{'A13':'normBlack'},
+        'num_format':{'B6:B6':'#,##0.0000', 'B7:B8':'#,##0'},
+        'num_format_col':{'G13':'#,##0.00',  'H13':'0.00%'}
+        }"
+    """
     # EVAL
     try:
         if str_format == '':    return True
@@ -1388,10 +1336,9 @@ def Act_StyleIntoExcel(str_path, str_format = '', str_SheetName = ''):
         return False
     return True
 
-
 #-----------------------------------------------------
 def fStr_defineStyle(xlWb, d_formatValue):
-    # Define and add a Style format depending on a name dev created (NikkoHeader_Blue)
+    """Define and add a Style format depending on a name dev created (NikkoHeader_Blue) """
     try:
         # Define the Style - Name
         # {'font':{'name':'Calibri', 'size':9}}
@@ -1432,10 +1379,9 @@ def fStr_defineStyle(xlWb, d_formatValue):
     except:     pass  #print('    (*) Information: Style already exists in the workbook: {}'.format(str_styleName))
     return str_styleName
 
-
 #-----------------------------------------------------
 def Act_loopFormat(l_rows, str_styleName, str_type = ''):
-    # Loop Cell by Cell to apply a format
+    """ Loop Cell by Cell to apply a format """
     try:
         for row in l_rows:
             for cell in row:
@@ -1452,7 +1398,6 @@ def Act_loopFormat(l_rows, str_styleName, str_type = ''):
             print(' - cell :', cell)
         except: pass
         raise
-
 
 #-----------------------------------------------------
 def Act_resizeRowColumn(xlWs, str_type, d_formatValue):
@@ -1473,7 +1418,6 @@ def Act_resizeRowColumn(xlWs, str_type, d_formatValue):
         print(' ERROR Act_resizeRowColumn')
         print(' - Err :', err)
         raise
-
 
 #-----------------------------------------------------
 def Act_loopBorder(str_type, rg_toSelect, str_borderName, bl_full = False):
@@ -1578,7 +1522,6 @@ def Act_loopBorder(str_type, rg_toSelect, str_borderName, bl_full = False):
         except: pass
         raise
 
-
 #-----------------------------------------------------
 def fRg_SelectRangeToApplyFormat(xlWs, str_cell, bl_includeHeader = True, bl_column = False):
     try:
@@ -1646,8 +1589,6 @@ def fRg_SelectRangeToApplyFormat(xlWs, str_cell, bl_includeHeader = True, bl_col
         raise
     return rg_toSelect
 
-
-
 #-----------------------------------------------------
 def Act_reshapePrintFormat(xlWs, d_formatValue):
     try:
@@ -1670,34 +1611,6 @@ def Act_reshapePrintFormat(xlWs, d_formatValue):
         print(' ERROR Act_reshapePrintFormat || {}'.format(err))
         raise
 
-#______________________________________________________________________________
-# ISSUE: xlsxwriter only can add some more WORKSHEET and not select
-#https://xlsxwriter.readthedocs.io/page_setup.html
-def Act_reshapePrintFormat_xlsxwriter(xlWs, d_formatValue):
-    #https://xlsxwriter.readthedocs.io/page_setup.html
-    d_setPapers = {'A4': 9, 'default':0, 'Letter': 1, 'A3': 8, 'A4 Small': 10}
-    try:
-        for kle in d_formatValue:            
-            if kle == 'set_paper':
-                paper_a4 = d_formatValue[kle]
-                paper_a4_inNumber = d_setPapers[paper_a4]
-                xlWs.set_paper(paper_a4_inNumber)
-            elif kle == 'print_area':
-                rangeToPrint = d_formatValue[kle]
-                xlWs.print_area(rangeToPrint)
-            elif kle == 'print_fit':
-                d_printFit = d_formatValue[kle]
-                int_nbPageHor = d_printFit['hor']
-                int_nbPageVer = d_printFit['vert']
-                xlWs.fit_to_pages(int_nbPageHor, int_nbPageVer)
-    except Exception as err:
-        print(' ERROR Act_reshapePrintFormat_xlsxwriter')
-        print(' - Err :', err)
-        raise
-#______________________________________________________________________________
-
-
-
 
 
 
@@ -1707,6 +1620,8 @@ def Act_reshapePrintFormat_xlsxwriter(xlWs, d_formatValue):
 # KILL Excel Management (outside of below class)
 #---------------------------------------------------------------
 def Act_KillExcel():
+    """ This function kills all session of Excel
+    Including the 'ghost' session you would kill from the Task Manager """
     for proc in psutil.process_iter():
         if any(procstr in proc.name() for procstr in ['Excel', 'EXCEL', 'excel']):
             try:
@@ -1729,8 +1644,12 @@ def Act_KillExcel2():
 # CLASS Excel Management (XLS, XLSX)
 #---------------------------------------------------------------
 @oth.dec_singletonsClass
-class c_xlApp_xlwings():
-    '''# DOC: https://docs.xlwings.org/en/stable/api.html'''
+class c_xlApp_xlwings:
+    """ The class allow you to manage excel with the library xlwings which might work better than win32
+    Open the Excel Office App, Close, Save, define / rename / create sheet, fill an area
+    The class is decorated to be a singleton so we always use the same instance of Excel
+    DOC: https://docs.xlwings.org/en/stable/api.html
+    """
     def __init__(self):
         self.__wkIsOpen     = False
         self.d_wkOpen       = {}
@@ -2024,7 +1943,11 @@ class c_xlApp_xlwings():
 
 
 @oth.dec_singletonsClass
-class c_win32_xlApp():
+class c_win32_xlApp:
+    """ The class allow you to manage excel with the library win32com.client
+    Open the Excel Office App, Close, Save, define / rename / create sheet, fill an area
+    The class is decorated to be a singleton so we always use the same instance of Excel
+    """
     def __init__(self):
         self.__wkIsOpen = False
         self.d_wkOpen = {}
@@ -2467,4 +2390,3 @@ def Act_CopPasteFolder_severalTry(str_folderDest, l_pathOrigin, dte_after = 10, 
             return True
         except: pass
     return False
-
