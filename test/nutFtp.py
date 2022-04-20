@@ -4,16 +4,21 @@ try:
     from . import nutDate as dat
     from . import nutOther as oth
 except:
-    import _lib as lib
-    import nutFiles as fl
-    import nutDate as dat
-    import nutOther as oth
+    try:
+        import _lib as lib
+        import nutFiles as fl
+        import nutDate as dat
+        import nutOther as oth
+    except:
+        from pyNut import _lib as lib
+        from pyNut import nutFiles as fl
+        from pyNut import nutDate as dat
+        from pyNut import nutOther as oth
 os          = lib.os()
 np          = lib.numpy()
 ftplib      = lib.ftplib()
 SSLSocket   = lib.SSLSocket()
 pmiko       = lib.paramiko()
-
 
 
 
@@ -45,7 +50,7 @@ class FTP_TLS_IgnoreHost(ftplib.FTP_TLS):
 # ------------- CLASS FTP management ---------------------------
 #---------------------------------------------------------------
 @oth.dec_singletonsClass
-class c_FTP():
+class c_FTP:
     def __init__(self, str_host, str_uid, str_pwd, bl_ssl = False, int_timeOut = -1, int_portnumber = 21):
         self.__str_host = str_host
         self.__str_uid = str_uid
@@ -59,7 +64,7 @@ class c_FTP():
         
     def __del__(self):
         self.__ftpConnexionClose()
-    
+
     def __str__(self):
         print('  ** FTP Credentials: {}|{}|{}|{}|'.format(self.__str_host, self.__str_uid, self.__str_pwd, self.__int_portnumber))
         
@@ -565,7 +570,3 @@ def ssh_getLastFile_inFolder_size(str_host, str_uid, str_pwd, l_ftpFolder, int_t
     file = ssh_getLastFile_inFolder(str_host, str_uid, str_pwd, l_ftpFolder, int_timeout, int_port)
     return file.st_size
 #-----------------------------------------------------------------
-
-
-
-

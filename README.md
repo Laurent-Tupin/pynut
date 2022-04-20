@@ -161,8 +161,10 @@ Temporary documentation for nutApi :
 
 Temporary documentation for nutEmail :
 
-    from pyNut import nutEmail as email
+    DESIGN PATTERN: BUILDER for OUTLOOK / EXCHANGELIB
+    Allow you to manage all relating to Emails with few lines of code
     
+    from pyNut import nutEmail as email
     
     1. Send an email with OUTLOOK
     
@@ -170,9 +172,7 @@ Temporary documentation for nutEmail :
     o_otlk_Director =       email.c_otlk_Director(o_builder_emailSend)
     o_otlk_Director.SendMail()
     bl_success = o_otlk_Director._builder.bl_success
-    
-    OR
-    
+        OR
     bl_success = email.fBl_SendMail_desPatt(**dic_param)
     
     WHERE 
@@ -180,7 +180,6 @@ Temporary documentation for nutEmail :
     dic_param = dict(bl_draft = True, l_pathAttach=['path1_fileToEnclose'], str_message = 'Hello',
                      str_from='', str_to='', str_cc='', str_bcc='',str_subject='Subject')    
     
-     
     2. Download files from Received Email on Outlook
     
     o_builder_emailDwld =   email.c_Outlook_dwld(**dic_param)
@@ -192,7 +191,6 @@ Temporary documentation for nutEmail :
     dic_param = dict(str_outAcctName = 'laurent@gmail.com', str_inbox = 'Inbox', l_folders = [],
                      str_subject = 'Sujet', str_to = '', str_cc = '', str_folder = 'PathForSaveFile',
                      str_File_startW = 'file_', str_File_endW = '_01.csv')
-    
     
     3. Download files from Received Email with Excahngelib (not on Outlook)
     
@@ -207,12 +205,43 @@ Temporary documentation for nutEmail :
                      str_File_startW = 'file_', str_File_endW = '_01.csv')
     
     
-    
-    
-    
-    
-    
+Temporary documentation for nutFtp :
 
+    Class c_FTP and c_SFTP allow you to Download / Upload on a server
+    Decorated to be a singleton as to keep the same instance / connection
+    FTP uses the ftplib library, SFTP paramiko
+    
+    from pyNut import nutFtp as ftp
+    
+    1.1. Download FTP
+    
+    ftp.fBl_ftpDownFileBinary(host, uid, pwd, ['FTP Folder'], fileName, folderToSave, bl_ssl = False)
+        OR
+    _ftp = ftp.ftp_prep(host, uid, pwd, ['FTP Folder'], bl_ssl = False)
+    _ftp.ftp_DownloadFile(fileName, folderToSave)
+    
+    1.2. Download SFTP
+    
+    ftp.ssh_downFile(host, uid, pwd, ['FTP Folder'], fileName, folderToSave, int_port = 10022)
+        OR
+    _sftp = sftp_prep(host, uid, pwd, ['FTP Folder'], int_timeout = -1, int_port = 10022)
+    _sftp.sftp_DownloadFile(fileName, folderToSave)
+    
+    2.1 Upload FTP
+    
+    ftp.fBl_ftpUpFile_Bi(host, uid, pwd, ['FTP Folder'], fileName, folderToSave,  bl_ssl = False)
+        OR
+    _ftp = ftp_prep(host, uid, pwd, ['FTP Folder'], bl_ssl = False)
+    _ftp.ftp_UploadFile(fileName, folderToSave)
+    
+    2.2 Upload SFTP
+    
+    bl_success = ftp.ssh_upFile(host, uid, pwd, ['FTP Folder'], fileName, folderToSave, int_port = 10022)
+        OR
+    _sftp = sftp_prep(host, uid, pwd, ['FTP Folder'], int_port = 10022)
+    _sftp.sftp_UploadFile(fileName, folderToSave)
+    
+    
 Temporary documentation for nutFiles :
 
     from pyNut import nutFiles as fl
