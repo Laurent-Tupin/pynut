@@ -144,6 +144,75 @@ Temporary documentation for nutOther :
         '''
     
 
+Temporary documentation for nutApi :
+
+    from pyNut import nutApi as Api
+        
+    1. Class
+    
+    inst_getAPI = Api.C_API_simple( (str_uid, str_pwd) )
+    inst_getAPI.api_connect_json( url )
+    inst_getAPI.api_returnDataFrame( l_url_keyword = ['data', 'price'] )
+    df_data = inst_getAPI.df_return
+    """ The class inherit from C_API 
+            allows the user to read an URL and get back a dataframe from JSON format
+        Is decorated to be a singleton"""
+    
+
+Temporary documentation for nutEmail :
+
+    from pyNut import nutEmail as email
+    
+    
+    1. Send an email with OUTLOOK
+    
+    o_builder_emailSend =   email.c_Outlook_send(**dic_param)
+    o_otlk_Director =       email.c_otlk_Director(o_builder_emailSend)
+    o_otlk_Director.SendMail()
+    bl_success = o_otlk_Director._builder.bl_success
+    
+    OR
+    
+    bl_success = email.fBl_SendMail_desPatt(**dic_param)
+    
+    WHERE 
+    
+    dic_param = dict(bl_draft = True, l_pathAttach=['path1_fileToEnclose'], str_message = 'Hello',
+                     str_from='', str_to='', str_cc='', str_bcc='',str_subject='Subject')    
+    
+     
+    2. Download files from Received Email on Outlook
+    
+    o_builder_emailDwld =   email.c_Outlook_dwld(**dic_param)
+    inst_Director =    email.c_otlk_Director(o_builder_emailDwld)
+    inst_Director.Download_fMail()
+    
+    WHERE 
+    
+    dic_param = dict(str_outAcctName = 'laurent@gmail.com', str_inbox = 'Inbox', l_folders = [],
+                     str_subject = 'Sujet', str_to = '', str_cc = '', str_folder = 'PathForSaveFile',
+                     str_File_startW = 'file_', str_File_endW = '_01.csv')
+    
+    
+    3. Download files from Received Email with Excahngelib (not on Outlook)
+    
+    o_builder_emailDwld = 	email.c_Webmail_dwld(**dic_param)
+    inst_Director =  	    email.c_otlk_Director(o_builder_emailDwld)
+    inst_Director.Download_fMail()
+    
+    WHERE 
+    
+    dic_param = dict(str_outAcctName = 'laurent@gmail.com', str_pwd = '*****', str_inbox = 'Inbox', l_folders = [],
+                     str_subject = 'Sujet', str_to = '', str_cc = '', str_folder = 'PathForSaveFile',
+                     str_File_startW = 'file_', str_File_endW = '_01.csv')
+    
+    
+    
+    
+    
+    
+    
+
 Temporary documentation for nutFiles :
 
     from pyNut import nutFiles as fl
@@ -369,73 +438,6 @@ Temporary documentation for nutFiles :
         Open the Excel Office App, Close, Save, define / rename / create sheet, fill an area
         The class is decorated to be a singleton so we always use the same instance of Excel
         """
-    
-
-Temporary documentation for nutApi :
-
-    from pyNut import nutApi as Api
-        
-    1. Class
-    
-    inst_getAPI = Api.C_API_simple( (str_uid, str_pwd) )
-    inst_getAPI.api_connect_json( url )
-    inst_getAPI.api_returnDataFrame( l_url_keyword = ['data', 'price'] )
-    df_data = inst_getAPI.df_return
-    """ The class inherit from C_API 
-            allows the user to read an URL and get back a dataframe from JSON format
-        Is decorated to be a singleton"""
-    
- 
-Temporary documentation for nutEmail :
-
-    from pyNut import nutEmail as email
-    
-    
-    1. Send an email with OUTLOOK
-    
-    o_builder_emailSend =   email.c_Outlook_send(**dic_param)
-    o_otlk_Director =       email.c_otlk_Director(o_builder_emailSend)
-    o_otlk_Director.SendMail()
-    bl_success = o_otlk_Director._builder.bl_success
-    
-    OR
-    
-    bl_success = email.fBl_SendMail_desPatt(**dic_param)
-    
-    WHERE 
-    
-    dic_param = dict(bl_draft = True, l_pathAttach=['path1_fileToEnclose'], str_message = 'Hello',
-                     str_from='', str_to='', str_cc='', str_bcc='',str_subject='Subject')    
-    
-     
-    2. Download files from Received Email on Outlook
-    
-    o_builder_emailDwld =   email.c_Outlook_dwld(**dic_param)
-    inst_Director =    email.c_otlk_Director(o_builder_emailDwld)
-    inst_Director.Download_fMail()
-    
-    WHERE 
-    
-    dic_param = dict(str_outAcctName = 'laurent@gmail.com', str_inbox = 'Inbox', l_folders = [],
-                     str_subject = 'Sujet', str_to = '', str_cc = '', str_folder = 'PathForSaveFile',
-                     str_File_startW = 'file_', str_File_endW = '_01.csv')
-    
-    
-    3. Download files from Received Email with Excahngelib (not on Outlook)
-    
-    o_builder_emailDwld = 	email.c_Webmail_dwld(**dic_param)
-    inst_Director =  	    email.c_otlk_Director(o_builder_emailDwld)
-    inst_Director.Download_fMail()
-    
-    WHERE 
-    
-    dic_param = dict(str_outAcctName = 'laurent@gmail.com', str_pwd = '*****', str_inbox = 'Inbox', l_folders = [],
-                     str_subject = 'Sujet', str_to = '', str_cc = '', str_folder = 'PathForSaveFile',
-                     str_File_startW = 'file_', str_File_endW = '_01.csv')
-    
-    
-    
-    
     
     
 ***END***
