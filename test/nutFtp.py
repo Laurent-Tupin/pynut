@@ -461,7 +461,8 @@ class c_SFTP():
             raise
         return self.l_nameFiles_wCharac
     
-    
+
+
 
 #---------------------------------------------------------------
 # ------ LEGACY: Function to launch Class ------------------
