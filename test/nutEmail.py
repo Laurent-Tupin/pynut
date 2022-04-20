@@ -15,8 +15,6 @@ except:
         from pyNut import nutFiles as fl
         from pyNut import nutDate as dat
 os  = lib.os()
-math= lib.math()
-pd  = lib.pandas()
 np  = lib.numpy()
 win32       = lib.win32()
 pythoncom   = lib.pythoncom()
