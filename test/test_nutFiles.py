@@ -138,10 +138,8 @@ def test_fL_GetFileList_withinModel_empty(fileName_X):
 def test_fDte_GetModificationDate():
     myPath = fl.fStr_myPath(__file__) + '\\' + fl.fStr_myFileName(__file__)
     dte_modif = fl.fDte_GetModificationDate(myPath)
-    # print(dte_modif)
-    # print(type(dte_modif))
-    # print(isinstance(dte_modif, datetime.datetime))
-    # assert (isinstance(dte_modif, datetime.datetime))
+    assert (isinstance(dte_modif, datetime.datetime))
+
 
 def test_fL_KeepFiles_wTimeLimit():
     myFolder = fl.fStr_myPath(__file__)
