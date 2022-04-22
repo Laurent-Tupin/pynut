@@ -55,10 +55,10 @@ def test_c_db_sqlServer():
     dbServer.request = "SELECT * FROM Table"
     assert (dbServer is not None)
 
-def test_c_db_sqlServer_singleton():
+def test_c_db_sqlServ_single_singleton():
     dbServer = db.c_db_sqlServ_single()
     dbServe2 = db.c_db_sqlServ_single()
-    d_param = dict(server='101', database='Test', uid='laurent', pwd='**abc**')  # timeout bl_AlertIfEmptyReq
+    d_param = dict(server='101', database='Test', uid='laurent', pwd='**abc**')
     dbServer.defineCredentials(**d_param)
     assert (dbServer.server == '101')
     assert (dbServe2.server == '101')
@@ -68,6 +68,22 @@ def test_c_db_sqlServer_singleton():
     assert (dbServe2.uid == 'Guillaume')
     assert (dbServer.timeout == 50)
     assert (dbServe2.timeout == 50)
+
+def test_c_db_dataframeCred_singleton():
+    dbServer = db.c_db_dataframeCred()
+    dbServe2 = db.c_db_dataframeCred()
+    d_param = dict(server='101', database='Test', uid='laurent', pwd='**abc**')
+    dbServer.defineCredentials(**d_param)
+    assert (dbServer.server == '101')
+    assert (dbServe2.server == '101')
+    d_para2 = dict(server='102', database='Prod', uid='Guillaume', pwd='**xyz**', timeout = 50, bl_AlertIfEmptyReq = False)
+    dbServe2.defineCredentials(**d_para2)
+    assert (dbServer.uid == 'Guillaume')
+    assert (dbServe2.uid == 'Guillaume')
+    assert (dbServer.timeout == 50)
+    assert (dbServe2.timeout == 50)
+
+
 
 
 #=============================================================================
@@ -90,12 +106,32 @@ def test_c_db_lite_functionnal():
     db_lite.closeConnection()
     assert (db_lite.cnxn is None)
 
-def test_c_db_dataframeCred_functionnal():
+def test_c_db_dataframeCred_dataframeCredentials():
     df_UID = fDf_lite_Launch()
     if df_UID is None:
         return None
+    dbServer = db.c_db_dataframeCred()
+    dbServer.dataframeCredentials(df_UID)
+    assert ('D1PRDSOLADB' in dbServer.server)
+    assert (dbServer.database == 'SolaDBServer')
+    assert (dbServer.uid == 'pcf_reporting')
 
-
+def test_c_db_dataframeCred_change_server():
+    df_UID = fDf_lite_Launch()
+    if df_UID is None:
+        return None
+    dbServer = db.c_db_dataframeCred()
+    dbServer.dataframeCredentials(df_UID)
+    # Wrong Server
+    dbServer.change_server('WrongServer')
+    assert ('D1PRDSOLADB' in dbServer.server)
+    assert (dbServer.database == 'SolaDBServer')
+    assert (dbServer.uid == 'pcf_reporting')
+    # right Server
+    dbServer.change_server('10.229.125.101')
+    assert ('10.229.125.101' in dbServer.server)
+    assert (dbServer.database == 'SolaDBServer')
+    assert (dbServer.uid == 'pcfReporting')
 
 
 
