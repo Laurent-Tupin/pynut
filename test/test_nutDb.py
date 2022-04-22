@@ -83,6 +83,20 @@ def test_c_db_dataframeCred_singleton():
     assert (dbServer.timeout == 50)
     assert (dbServe2.timeout == 50)
 
+def test_c_db_withLog_singleton():
+    dbServer = db.c_db_withLog()
+    dbServe2 = db.c_db_withLog()
+    d_param = dict(server='101', database='Test', uid='laurent', pwd='**abc**')
+    dbServer.defineCredentials(**d_param)
+    assert (dbServer.server == '101')
+    assert (dbServe2.server == '101')
+    d_para2 = dict(server='102', database='Prod', uid='Guillaume', pwd='**xyz**', timeout = 50, bl_AlertIfEmptyReq = False)
+    dbServe2.defineCredentials(**d_para2)
+    assert (dbServer.uid == 'Guillaume')
+    assert (dbServe2.uid == 'Guillaume')
+    assert (dbServer.timeout == 50)
+    assert (dbServe2.timeout == 50)
+
 
 
 
@@ -116,22 +130,122 @@ def test_c_db_dataframeCred_dataframeCredentials():
     assert (dbServer.database == 'SolaDBServer')
     assert (dbServer.uid == 'pcf_reporting')
 
-def test_c_db_dataframeCred_change_server():
+def test_c_db_withLog_dataframeCredentials():
+    df_UID = fDf_lite_Launch()
+    if df_UID is None:
+        return None
+    dbServer = db.c_db_withLog()
+    dbServer.dataframeCredentials(df_UID)
+    assert ('D1PRDSOLADB' in dbServer.server)
+    assert (dbServer.database == 'SolaDBServer')
+    assert (dbServer.uid == 'pcf_reporting')
+
+def test_c_db_dataframeCred_change_database():
     df_UID = fDf_lite_Launch()
     if df_UID is None:
         return None
     dbServer = db.c_db_dataframeCred()
     dbServer.dataframeCredentials(df_UID)
-    # Wrong Server
-    dbServer.change_server('WrongServer')
-    assert ('D1PRDSOLADB' in dbServer.server)
-    assert (dbServer.database == 'SolaDBServer')
-    assert (dbServer.uid == 'pcf_reporting')
     # right Server
+    dbServer.change_database('database_ppp')
+    assert ('D1PRDSOLADB' in dbServer.server)
+    assert (dbServer.database == 'database_ppp')
+    assert (dbServer.uid == 'pcf_reporting')
+
+def test_c_db_withLog_change_database():
+    df_UID = fDf_lite_Launch()
+    if df_UID is None:
+        return None
+    dbServer = db.c_db_withLog()
+    dbServer.dataframeCredentials(df_UID)
+    # right Server
+    dbServer.change_database('database_ppp')
+    assert ('D1PRDSOLADB' in dbServer.server)
+    assert (dbServer.database == 'database_ppp')
+    assert (dbServer.uid == 'pcf_reporting')
+
+def test_c_db_dataframeCred_connect():
+    df_UID = fDf_lite_Launch()
+    if df_UID is None:
+        return None
+    dbServer = db.c_db_dataframeCred()
+    dbServer.dataframeCredentials(df_UID)
+    # Connect
+    int_return = dbServer.connect()
+    assert (int_return == 2)
+    assert (dbServer.cnxn is not None)
+    int_return = dbServer.connect()
+    assert (int_return == 1)
+    # New connection
     dbServer.change_server('10.229.125.101')
-    assert ('10.229.125.101' in dbServer.server)
-    assert (dbServer.database == 'SolaDBServer')
-    assert (dbServer.uid == 'pcfReporting')
+    int_return = dbServer.connect()
+    assert (int_return == 2)
+    # go back to old connection
+    dbServer.change_server('D1PRDSOLADB.infocloud.local')
+    int_return = dbServer.connect()
+    assert (int_return == 3)
+    # Close connection
+    dbServer.closeConnection()
+    assert (dbServer.cnxn is None)
+
+
+def test_c_db_withLog_connect():
+    df_UID = fDf_lite_Launch()
+    if df_UID is None:
+        return None
+    dbServer = db.c_db_withLog()
+    dbServer.dataframeCredentials(df_UID)
+    # Connect
+    int_return = dbServer.connect()
+    assert (int_return == 2)
+    assert (dbServer.cnxn is not None)
+    int_return = dbServer.connect()
+    assert (int_return == 1)
+    # New connection
+    dbServer.change_server('10.229.125.101')
+    int_return = dbServer.connect()
+    assert (int_return == 2)
+    # go back to old connection
+    dbServer.change_server('D1PRDSOLADB.infocloud.local')
+    int_return = dbServer.connect()
+    assert (int_return == 3)
+    # Close connection
+    dbServer.closeConnection()
+    assert (dbServer.cnxn is None)
+
+def test_c_db_dataframeCred_request():
+    df_UID = fDf_lite_Launch()
+    if df_UID is None:
+        return None
+    dbServer = db.c_db_dataframeCred()
+    dbServer.dataframeCredentials(df_UID)
+    dbServer.change_server('10.229.125.101')
+    dbServer.change_database('SolaQC')
+    dbServer.connect()
+    dbServer.request = 'SELECT top 1 * FROM log ORDER BY [dtm_log]'
+    dbServer.getDataframe()
+    dbServer.commit()
+    df_data = dbServer.df_result
+    assert (df_data['str_user'].values[0] == 'laurent.tupin')
+    assert (df_data['str_toolName'].values[0] == 'Sirius_PCF_dev.xlsb')
+
+def test_c_db_withLog_request():
+    df_UID = fDf_lite_Launch()
+    if df_UID is None:
+        return None
+    dbServer = db.c_db_withLog()
+    dbServer.dataframeCredentials(df_UID)
+    dbServer.change_server('10.229.125.101')
+    dbServer.change_database('SolaQC')
+    dbServer.connect()
+    dbServer.request = 'SELECT top 1 * FROM log ORDER BY [dtm_log]'
+    dbServer.getDataframe()
+    dbServer.commit()
+    df_data = dbServer.df_result
+    assert (df_data['str_user'].values[0] == 'laurent.tupin')
+    assert (df_data['str_toolName'].values[0] == 'Sirius_PCF_dev.xlsb')
+
+
 
 
 

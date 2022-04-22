@@ -54,11 +54,16 @@ class c_db_sqlServer:
         self.__bl_AlertIfEmptyReq = True
         self.__timeout = 100
         self.__request = 'Request not defined'
+        self.cnxn = None
     def defineCredentials(self, **d_param):
-        self.__server = d_param['server']
-        self.__database = d_param['database']
-        self.__uid = d_param['uid']
-        self.__pwd = d_param['pwd']
+        if 'server' in d_param:
+            self.__server =     d_param['server']
+        if 'database' in d_param:
+            self.__database =   d_param['database']
+        if 'uid' in d_param:
+            self.__uid =        d_param['uid']
+        if 'pwd' in d_param:
+            self.__pwd =        d_param['pwd']
         if 'timeout' in d_param:
             self.__timeout = d_param['timeout']
         if 'bl_AlertIfEmptyReq' in d_param:
@@ -105,14 +110,18 @@ class c_db_sqlServer:
                 # trusted_connection=YES;  for Windows Authentification
                 # Save the connexion in a dico with KEY = ID in tuple
                 self.__dict_Connect[t_keyConnect] = self.cnxn
-                self.t_keyConnect_Current = t_keyConnect  # Keep in mind for the next Connexion
+                # Keep in mind for the next Connexion
+                self.t_keyConnect_Current = t_keyConnect
+                return 2
             elif self.t_keyConnect_Current != t_keyConnect:
                 self.cnxn = self.__dict_Connect[t_keyConnect]
-                self.t_keyConnect_Current = t_keyConnect  # Keep in mind the last Connexion
+                # Keep in mind for the next Connexion
+                self.t_keyConnect_Current = t_keyConnect
+                return 3
             elif self.__dict_Connect[t_keyConnect] == -1:
                 # raise
-                return False
-            else:   pass
+                return -1
+            else:   return 1
             # CURSOR
             self.cursor = self.cnxn.cursor()
         except Exception as err:
@@ -190,7 +199,7 @@ class c_db_sqlServer:
         except: pass
         try:    self.cnxn.close()
         except: pass
-
+        self.cnxn = None
     def __del__(self):
         self.closeConnection()
 
@@ -202,8 +211,7 @@ class c_db_sqlServ_single(c_db_sqlServer):
         super().__init__()
 
 
-@oth.dec_singletonsClass
-class c_db_dataframeCred(c_db_sqlServer):
+class c_db_dfCredentials(c_db_sqlServer):
     """ This inehrit from c_db_sqlServer and is a singleton
     Manage the Credentials in a dataframe form"""
     def __init__(self):
@@ -217,38 +225,115 @@ class c_db_dataframeCred(c_db_sqlServer):
         self.uidColName =       l_columns[2]
         self.pwdColName =       l_columns[3]
         try:
-            self.__server_default =     df_UID[self.serverColName].values[0]
-            self.__database_default =   df_UID[self.databaseColName].values[0]
-            self.__uid_default =        df_UID[self.uidColName].values[0]
-            self.__pwd_default =        df_UID[self.pwdColName].values[0]
+            str_server =     df_UID[self.serverColName].values[0]
+            str_database =   df_UID[self.databaseColName].values[0]
+            str_uid =        df_UID[self.uidColName].values[0]
+            str_pwd =        df_UID[self.pwdColName].values[0]
         except:
             self.serverColName = 'Server'
             self.databaseColName = 'Database'
             self.uidColName = 'Uid'
             self.pwdColName = 'Password'
-            self.__server_default =     df_UID['Server'].values[0]
-            self.__database_default =   df_UID['Database'].values[0]
-            self.__uid_default =        df_UID['Uid'].values[0]
-            self.__pwd_default =        df_UID['Password'].values[0]
-        # Real Value = Default
-        d_param = dict(server=self.__server_default, database=self.__database_default, uid=self.__uid_default, pwd=self.__pwd_default)
+            str_server =    df_UID[self.serverColName].values[0]
+            str_database =  df_UID[self.databaseColName].values[0]
+            str_uid =       df_UID[self.uidColName].values[0]
+            str_pwd =       df_UID[self.pwdColName].values[0]
+        # Keep in memory the last working server
+        self.__last_server = str_server
+        # Set the value by the original Class
+        d_param = dict(server=str_server, database=str_database, uid=str_uid,pwd=str_pwd)
         self.defineCredentials(**d_param)
     def change_server(self, str_server = ''):
         if not str_server == '':
-            # Change of Default Value
             df_UID = self.df_UID
-            self.__server_default = str_server
             try:
-                self.__database_default =   df_UID.loc[df_UID[self.serverColName] == str_server, self.databaseColName].values[0]
-                self.__uid_default =        df_UID.loc[df_UID[self.serverColName] == str_server, self.uidColName].values[0]
-                self.__pwd_default =        df_UID.loc[df_UID[self.serverColName] == str_server, self.pwdColName].values[0]
+                str_database =   df_UID.loc[df_UID[self.serverColName] == str_server, self.databaseColName].values[0]
+                str_uid =        df_UID.loc[df_UID[self.serverColName] == str_server, self.uidColName].values[0]
+                str_pwd =        df_UID.loc[df_UID[self.serverColName] == str_server, self.pwdColName].values[0]
             except Exception as err:
-                print('ERROR in change_server: we could not find the server: |{}| in the Datafrane provided \n'.format(str_server))
+                print('ERROR in change_server: we could not find the server: |{}| in the Dataframe provided \n'.format(str_server))
                 print(df_UID)
-                self.__server_default = self.server
-        # Real Value = Default
-        d_param = dict(server=self.__server_default, database=self.__database_default, uid=self.__uid_default, pwd=self.__pwd_default)
-        self.defineCredentials(**d_param)
+                return False
+            # Keep in memory the last working server
+            self.__last_server = str_server
+            # Set the value by the original Class
+            d_param = dict(server=str_server, database=str_database, uid=str_uid, pwd=str_pwd)
+            self.defineCredentials(**d_param)
+        return True
+    def change_database(self, str_database = ''):
+        if not str_database == '':
+            df_UID = self.df_UID
+            str_server = self.__last_server
+            str_uid = df_UID.loc[df_UID[self.serverColName] == str_server, self.uidColName].values[0]
+            str_pwd = df_UID.loc[df_UID[self.serverColName] == str_server, self.pwdColName].values[0]
+            # Set the value by the original Class
+            d_param = dict(server=str_server, database=str_database, uid=str_uid, pwd=str_pwd)
+            self.defineCredentials(**d_param)
+        return True
+
+
+@oth.dec_singletonsClass
+class c_db_dataframeCred(c_db_dfCredentials):
+    """ This inehrit from c_db_dfCredentials + is a singleton"""
+    def __init__(self):
+        super().__init__()
+
+
+@oth.dec_singletonsClass
+class c_db_withLog(c_db_dfCredentials):
+    """ This inehrit from c_db_dfCredentials + is a singleton
+    Allow you to manage some Log request inside a particular server and database
+    without changing the connection of the other requests"""
+    def __init__(self):
+        super().__init__()
+        self.__server_default = None
+    def dataframeCredentials(self, df_UID):
+        super().dataframeCredentials(df_UID)
+
+
+
+
+        # self.df_UID = df_UID
+        # # Get the columns of the UID given the order of columns are: Server, database, UID, Password
+        # l_columns = df_UID.columns
+        # self.serverColName =    l_columns[0]
+        # self.databaseColName =  l_columns[1]
+        # self.uidColName =       l_columns[2]
+        # self.pwdColName =       l_columns[3]
+        # try:
+        #     self.__server_default =     df_UID[self.serverColName].values[0]
+        #     self.__database_default =   df_UID[self.databaseColName].values[0]
+        #     self.__uid_default =        df_UID[self.uidColName].values[0]
+        #     self.__pwd_default =        df_UID[self.pwdColName].values[0]
+        # except:
+        #     self.serverColName = 'Server'
+        #     self.databaseColName = 'Database'
+        #     self.uidColName = 'Uid'
+        #     self.pwdColName = 'Password'
+        #     self.__server_default =     df_UID['Server'].values[0]
+        #     self.__database_default =   df_UID['Database'].values[0]
+        #     self.__uid_default =        df_UID['Uid'].values[0]
+        #     self.__pwd_default =        df_UID['Password'].values[0]
+        # # Real Value = Default
+        # d_param = dict(server=self.__server_default, database=self.__database_default, uid=self.__uid_default, pwd=self.__pwd_default)
+        # self.defineCredentials(**d_param)
+
+    # def change_server(self, str_server = ''):
+    #     if not str_server == '':
+    #         # Change of Default Value
+    #         df_UID = self.df_UID
+    #         self.__server_default = str_server
+    #         try:
+    #             self.__database_default =   df_UID.loc[df_UID[self.serverColName] == str_server, self.databaseColName].values[0]
+    #             self.__uid_default =        df_UID.loc[df_UID[self.serverColName] == str_server, self.uidColName].values[0]
+    #             self.__pwd_default =        df_UID.loc[df_UID[self.serverColName] == str_server, self.pwdColName].values[0]
+    #         except Exception as err:
+    #             print('ERROR in change_server: we could not find the server: |{}| in the Datafrane provided \n'.format(str_server))
+    #             print(df_UID)
+    #             self.__server_default = self.server
+    #     # Real Value = Default
+    #     d_param = dict(server=self.__server_default, database=self.__database_default, uid=self.__uid_default, pwd=self.__pwd_default)
+    #     self.defineCredentials(**d_param)
 
 
 
