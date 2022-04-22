@@ -40,13 +40,14 @@ class c_db_lite:
         self.df_req = df_req
         return df_req
     def closeConnection(self):
-        self.cnxn.close()
+        try:    self.cnxn.close()
+        except: pass
         self.cnxn = None
     def __del__(self):
         self.closeConnection()
 
 
-@oth.dec_singletonsClass
+
 class c_db_sqlServer:
     def __init__(self):
         self.__dict_Connect = {}
@@ -63,6 +64,18 @@ class c_db_sqlServer:
         if 'bl_AlertIfEmptyReq' in d_param:
             self.__bl_AlertIfEmptyReq = d_param['bl_AlertIfEmptyReq']
     @property
+    def server(self):
+        return self.__server
+    @property
+    def database(self):
+        return self.__database
+    @property
+    def uid(self):
+        return self.__uid
+    @property
+    def timeout(self):
+        return self.__timeout
+    @property
     def request(self):
         return self.__request
     @request.setter
@@ -71,10 +84,10 @@ class c_db_sqlServer:
             self.__request = str_request
 
     def __str__(self, message = ''):
-        str_msg = '--------------------------------------'
-        str_msg += '  - ', self.__server, self.__database, self.__uid
-        str_msg += '  - ', self.__request
-        str_msg += message
+        str_msg = '--------------------------------------\n'
+        str_msg += '  - |{}|, |{}|, |{}| \n'.format(self.__server, self.__database, self.__uid)
+        str_msg += '  - |{}| \n'.format(self.__request)
+        str_msg += '  - {} \n'.format(message)
         str_msg += '--------------------------------------'
         print(str_msg)
         return str_msg
@@ -127,7 +140,7 @@ class c_db_sqlServer:
         try:
             self.df_result = pd.read_sql(self.__request, self.cnxn)
             # Message if request is empty
-            if self.__bl_AlertIfEmptyReq:
+            if self.__bl_AlertIfEmptyReq is True:
                 if self.df_result.empty or self.df_result.dropna(how='all').empty:
                     self.__str__(' EMPTY: getDataframe is empty')
         except Exception as err:
@@ -147,7 +160,7 @@ class c_db_sqlServer:
             # Final Result
             self.df_result =      df_resultSet
             # Message if empty
-            if self.__bl_AlertIfEmptyReq:
+            if self.__bl_AlertIfEmptyReq is True:
                 if self.df_result.empty or self.df_result.dropna(how = 'all').empty:
                     self.__str__(' EMPTY: getDataframe is empty')
         except Exception as err:
@@ -180,6 +193,24 @@ class c_db_sqlServer:
 
     def __del__(self):
         self.closeConnection()
+
+
+
+@oth.dec_singletonsClass
+class c_db_sqlServ_single(c_db_sqlServer):
+    """ This inehrit from c_db_sqlServer and is a singleton"""
+    def __init__(self):
+        super().__init__()
+
+
+@oth.dec_singletonsClass
+class c_db_dataframeCred(c_db_sqlServer):
+    """ This inehrit from c_db_sqlServer and is a singleton
+    Manage the Credentials in a dataframe form"""
+    def __init__(self):
+        super().__init__()
+
+
 
 
 
