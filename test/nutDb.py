@@ -26,7 +26,11 @@ lite =   lib.sqlite3()
 #---------------------------------------------------------------
 @oth.dec_singletonsClass
 class c_db_lite:
-    def __init__(self, str_pathDb):
+    """ This class allows you to manage simple lite database"""
+    def __init__(self):
+        self.str_pathDb = None
+        self.cnxn = None
+    def definePath(self, str_pathDb):
         self.str_pathDb = str_pathDb
     def connect(self):
         cnxn = lite.connect(self.str_pathDb)
@@ -37,8 +41,10 @@ class c_db_lite:
         return df_req
     def closeConnection(self):
         self.cnxn.close()
+        self.cnxn = None
     def __del__(self):
         self.closeConnection()
+
 
 @oth.dec_singletonsClass
 class c_db_sqlServer:

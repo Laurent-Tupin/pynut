@@ -242,6 +242,28 @@ Temporary documentation for nutFtp :
     _sftp.sftp_UploadFile(fileName, folderToSave)
     
     
+Temporary documentation for nutDb :
+    
+    from pyNut import nutDb as db
+    
+    1. Lite Db
+    
+    db_lite = db.c_db_lite(r'\db_param.db')
+    db_lite.connect()
+    df_UID = db_lite.getDataframe("SELECT * FROM tbl_connectSolaDb")
+    db_lite.closeConnection()
+    """ This class allows you to manage simple lite database"""
+    
+    2. SQL Server (pyodbc)
+    
+    
+    
+    
+    
+    
+    
+    
+    
 Temporary documentation for nutFiles :
 
     from pyNut import nutFiles as fl
