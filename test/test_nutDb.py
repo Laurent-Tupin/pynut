@@ -140,6 +140,40 @@ def test_c_db_withLog_dataframeCredentials():
     assert (dbServer.database == 'SolaDBServer')
     assert (dbServer.uid == 'pcf_reporting')
 
+def test_c_db_dataframeCred_change_server():
+    df_UID = fDf_lite_Launch()
+    if df_UID is None:
+        return None
+    dbServer = db.c_db_dataframeCred()
+    dbServer.dataframeCredentials(df_UID)
+    # Wrong Server
+    dbServer.change_server('WrongServer')
+    assert ('D1PRDSOLADB' in dbServer.server)
+    assert (dbServer.database == 'SolaDBServer')
+    assert (dbServer.uid == 'pcf_reporting')
+    # right Server
+    dbServer.change_server('10.229.125.101')
+    assert ('10.229.125.101' in dbServer.server)
+    assert (dbServer.database == 'SolaDBServer')
+    assert (dbServer.uid == 'pcfReporting')
+
+def test_c_db_withLog_change_server():
+    df_UID = fDf_lite_Launch()
+    if df_UID is None:
+        return None
+    dbServer = db.c_db_withLog()
+    dbServer.dataframeCredentials(df_UID)
+    # Wrong Server
+    dbServer.change_server('WrongServer')
+    assert ('D1PRDSOLADB' in dbServer.server)
+    assert (dbServer.database == 'SolaDBServer')
+    assert (dbServer.uid == 'pcf_reporting')
+    # right Server
+    dbServer.change_server('10.229.125.101')
+    assert ('10.229.125.101' in dbServer.server)
+    assert (dbServer.database == 'SolaDBServer')
+    assert (dbServer.uid == 'pcfReporting')
+
 def test_c_db_dataframeCred_change_database():
     df_UID = fDf_lite_Launch()
     if df_UID is None:
@@ -249,7 +283,7 @@ def test_c_db_withLog_request():
 
 
 
-
+#.define_Log_Cred('10.229.125.101', 'SolaQC')
 
 
 

@@ -78,6 +78,9 @@ class c_db_sqlServer:
     def uid(self):
         return self.__uid
     @property
+    def pwd(self):
+        return self.__pwd
+    @property
     def timeout(self):
         return self.__timeout
     @property
@@ -289,55 +292,33 @@ class c_db_withLog(c_db_dfCredentials):
         self.__server_default = None
     def dataframeCredentials(self, df_UID):
         super().dataframeCredentials(df_UID)
-
-
-
-
-        # self.df_UID = df_UID
-        # # Get the columns of the UID given the order of columns are: Server, database, UID, Password
-        # l_columns = df_UID.columns
-        # self.serverColName =    l_columns[0]
-        # self.databaseColName =  l_columns[1]
-        # self.uidColName =       l_columns[2]
-        # self.pwdColName =       l_columns[3]
-        # try:
-        #     self.__server_default =     df_UID[self.serverColName].values[0]
-        #     self.__database_default =   df_UID[self.databaseColName].values[0]
-        #     self.__uid_default =        df_UID[self.uidColName].values[0]
-        #     self.__pwd_default =        df_UID[self.pwdColName].values[0]
-        # except:
-        #     self.serverColName = 'Server'
-        #     self.databaseColName = 'Database'
-        #     self.uidColName = 'Uid'
-        #     self.pwdColName = 'Password'
-        #     self.__server_default =     df_UID['Server'].values[0]
-        #     self.__database_default =   df_UID['Database'].values[0]
-        #     self.__uid_default =        df_UID['Uid'].values[0]
-        #     self.__pwd_default =        df_UID['Password'].values[0]
-        # # Real Value = Default
-        # d_param = dict(server=self.__server_default, database=self.__database_default, uid=self.__uid_default, pwd=self.__pwd_default)
-        # self.defineCredentials(**d_param)
-
-    # def change_server(self, str_server = ''):
-    #     if not str_server == '':
-    #         # Change of Default Value
-    #         df_UID = self.df_UID
-    #         self.__server_default = str_server
-    #         try:
-    #             self.__database_default =   df_UID.loc[df_UID[self.serverColName] == str_server, self.databaseColName].values[0]
-    #             self.__uid_default =        df_UID.loc[df_UID[self.serverColName] == str_server, self.uidColName].values[0]
-    #             self.__pwd_default =        df_UID.loc[df_UID[self.serverColName] == str_server, self.pwdColName].values[0]
-    #         except Exception as err:
-    #             print('ERROR in change_server: we could not find the server: |{}| in the Datafrane provided \n'.format(str_server))
-    #             print(df_UID)
-    #             self.__server_default = self.server
-    #     # Real Value = Default
-    #     d_param = dict(server=self.__server_default, database=self.__database_default, uid=self.__uid_default, pwd=self.__pwd_default)
-    #     self.defineCredentials(**d_param)
-
-
-
-
+        self.__server_default =     self.server
+        self.__database_default =   self.database
+        self.__uid_default =        self.uid
+        self.__pwd_default =        self.pwd
+    def change_server(self, str_server = ''):
+        super().change_server(str_server)
+        if not str_server == '':
+            self.__server_default =     self.server
+            self.__database_default =   self.database
+            self.__uid_default =        self.uid
+            self.__pwd_default =        self.pwd
+    def define_Log_Cred(self, str_serverForLog, str_databaseForLog):
+        df_UID = self.df_UID
+        self.__server_Log =     str_serverForLog
+        self.__database_Log =   str_databaseForLog
+        self.__uid_Log =        df_UID.loc[df_UID[self.serverColName] == self.__server, self.uidColName].values[0]
+        self.__pwd_Log =        df_UID.loc[df_UID[self.serverColName] == self.__server, self.pwdColName].values[0]
+    def executeLog(self, str_logReq):
+        d_pLog = dict(server=self.__server_Log, database=self.__database_Log, uid=self.__uid_Log, pwd=self.__pwd_Log)
+        self.defineCredentials(**d_pLog)
+        self.request = str_logReq
+        self.connect()
+        self.executeReq()
+        self.commit()
+        # Go back to the original Credentials
+        d_pDefault = dict(server=self.__server_default, database=self.__database_default, uid=self.__uid_default, pwd=self.__pwd_default)
+        self.defineCredentials(**d_pDefault)
 
 
 
