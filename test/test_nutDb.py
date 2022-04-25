@@ -9,6 +9,7 @@ try:    import nutFiles as fl
 except: from pyNut import nutFiles as fl
 
 
+
 #=============================================================================
 # function...
 #=============================================================================
@@ -29,6 +30,7 @@ def fDf_lite_Launch():
     df_UID =        db_lite.getDataframe(str_req)
     db_lite.closeConnection()
     return df_UID
+
 
 
 #=============================================================================
@@ -96,7 +98,6 @@ def test_c_db_withLog_singleton():
     assert (dbServe2.uid == 'Guillaume')
     assert (dbServer.timeout == 50)
     assert (dbServe2.timeout == 50)
-
 
 
 
@@ -384,4 +385,21 @@ def test_db_SelectReq():
     assert (dbServer.cnxn is not None)
     assert (isinstance(dbServer.df_result, pd.DataFrame))
 
+def test_db_EXEC_dbLogInRequest():
+    LaunchData()
+    dbServer = db.c_db_withLog()
+    db.db_SelectReq('SELECT top 10 * FROM tblCountry')
+    assert ('D1PRDSOLADB' in dbServer.server)
+    assert (dbServer.database == 'SolaDBServer')
+    assert (dbServer.uid == 'pcf_reporting')
+    assert (dbServer.cursor is not None)
+    assert (dbServer.cnxn is not None)
+    assert (isinstance(dbServer.df_result, pd.DataFrame))
+    db.db_EXEC('SELECT top 1 * FROM SolaQC..log ORDER BY [dtm_log]')
+    assert ('D1PRDSOLADB' in dbServer.server)
+    assert (dbServer.database == 'SolaDBServer')
+    assert (dbServer.uid == 'pcf_reporting')
+    assert (dbServer.cursor is not None)
+    assert (dbServer.cnxn is not None)
+    assert (isinstance(dbServer.df_result, pd.DataFrame))
 

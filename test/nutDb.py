@@ -104,37 +104,43 @@ class c_db_sqlServer:
     def connect(self):                  # db_sqlConnectCursor
         i_cnxReturn = 0
         t_keyConnect = (self.__server, self.__database, self.__uid)
-        try:
-            if t_keyConnect not in self.__dict_Connect:
-                # NEW connexion
+        if t_keyConnect not in self.__dict_Connect:
+            #----------------------------------------------------------------------------------
+            # NEW connexion
+            try:
                 self.cnxn = pyodbc.connect('DRIVER={SQL Server};SERVER=' + self.__server +
                                            ';DATABASE=' + self.__database +
                                            ';UID=' + self.__uid +
                                            ';PWD=' + self.__pwd,
                                            timeout = self.__timeout)
                 # trusted_connection=YES;  for Windows Authentification
-                # Save the connexion in a dico with KEY = ID in tuple
-                self.__dict_Connect[t_keyConnect] = self.cnxn
-                # Keep in mind for the next Connexion
-                self.t_keyConnect_Current = t_keyConnect
-                i_cnxReturn = 2
-            elif self.t_keyConnect_Current != t_keyConnect:
-                self.cnxn = self.__dict_Connect[t_keyConnect]
-                # Keep in mind for the next Connexion
-                self.t_keyConnect_Current = t_keyConnect
-                i_cnxReturn = 3
-            elif self.__dict_Connect[t_keyConnect] == -1:
-                # raise
-                i_cnxReturn = -1
-                return i_cnxReturn
-            else:
-                i_cnxReturn = 1
-                return i_cnxReturn
-            # CURSOR
-            self.cursor = self.cnxn.cursor()
+                # Save the connexion in a dico with KEY = ID in tuple0
+            except Exception as err:
+                self.__str__(' ERROR: Your db connexion is not working || {} || {}'.format(err, str(i_cnxReturn)))
+                raise
+            # ----------------------------------------------------------------------------------
+            self.__dict_Connect[t_keyConnect] = self.cnxn
+            # Keep in mind for the next Connexion
+            self.t_keyConnect_Current = t_keyConnect
+            i_cnxReturn = 2
+        elif self.t_keyConnect_Current != t_keyConnect:
+            self.cnxn = self.__dict_Connect[t_keyConnect]
+            # Keep in mind for the next Connexion
+            self.t_keyConnect_Current = t_keyConnect
+            i_cnxReturn = 3
+        # elif self.__dict_Connect[t_keyConnect] == -1:
+        #     # raise
+        #     i_cnxReturn = -1
+        #     return i_cnxReturn
+        else:
+            i_cnxReturn = 1
+            return i_cnxReturn
+        # CURSOR
+        try:    self.cursor = self.cnxn.cursor()
         except Exception as err:
-            self.__str__(' ERROR: Your db connexion is not working || {} || {}'.format(err, str(i_cnxReturn)))
+            self.__str__(' ERROR: Your db CURSOR is not working || {} || {}'.format(err, str(i_cnxReturn)))
             raise
+        # END
         return i_cnxReturn
 
     def availablePyodbcDrivers(self):       # db_seeDriversAvailable
@@ -316,12 +322,12 @@ class c_db_withLog(c_db_dfCredentials):
             self.__pwd_default =        self.pwd
     def define_Log_Cred(self, str_serverForLog = None, str_databaseForLog = None):
         df_UID = self.df_UID
-        self.__server_Log =     str_serverForLog
-        self.__database_Log =   str_databaseForLog
-        self.__uid_Log =        df_UID.loc[df_UID[self.serverColName] == self.__server_Log, self.uidColName].values[0]
-        self.__pwd_Log =        df_UID.loc[df_UID[self.serverColName] == self.__server_Log, self.pwdColName].values[0]
+        self.server_Log =       str_serverForLog
+        self.db_Log =           str_databaseForLog
+        self.__uid_Log =        df_UID.loc[df_UID[self.serverColName] == self.server_Log, self.uidColName].values[0]
+        self.__pwd_Log =        df_UID.loc[df_UID[self.serverColName] == self.server_Log, self.pwdColName].values[0]
     def executeLog(self, str_logExec = ''):
-        d_pLog = dict(server=self.__server_Log, database=self.__database_Log, uid=self.__uid_Log, pwd=self.__pwd_Log)
+        d_pLog = dict(server=self.server_Log, database=self.db_Log, uid=self.__uid_Log, pwd=self.__pwd_Log)
         self.defineCredentials(**d_pLog)
         self.request = str_logExec
         self.connect()
@@ -354,8 +360,12 @@ def db_DefineConnectCursor(str_req, df_UID=None, t_logId=None):
 def db_EXEC(str_req, df_UID = None, t_logId = None):
     dbServer = c_db_withLog()
     db_DefineConnectCursor(str_req, df_UID, t_logId)
-    dbServer.executeReq()
-    dbServer.commit()
+    if '{}.'.format(dbServer.db_Log).lower() in str_req.lower():
+        print('  (**) Database will be {} for this request: \n   **{}**'.format(dbServer.db_Log, str_req))
+        dbServer.executeLog(str_req)
+    else:
+        dbServer.executeReq()
+        dbServer.commit()
     return True
 
 def db_SelectReq(str_req, df_UID=None, t_logId=None):
