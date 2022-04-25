@@ -279,13 +279,58 @@ def test_c_db_withLog_request():
     assert (df_data['str_user'].values[0] == 'laurent.tupin')
     assert (df_data['str_toolName'].values[0] == 'Sirius_PCF_dev.xlsb')
 
+def test_c_db_dataframeCred_request():
+    df_UID = fDf_lite_Launch()
+    if df_UID is None:
+        return None
+    dbServer = db.c_db_dataframeCred()
+    dbServer.dataframeCredentials(df_UID)
+    dbServer.change_server('10.229.125.101')
+    dbServer.change_database('SolaQC')
+    dbServer.connect()
+    assert (dbServer.cnxn is not None)
+    assert (dbServer.cursor is not None)
+    dbServer.request = 'SELECT top 1 * FROM log ORDER BY [dtm_log]'
+    dbServer.executeReq()
+    dbServer.commit()
+    assert ('10.229.125.101' in dbServer.server)
+    assert (dbServer.database == 'SolaQC')
 
+def test_c_db_withLog_request():
+    df_UID = fDf_lite_Launch()
+    if df_UID is None:
+        return None
+    dbServer = db.c_db_withLog()
+    dbServer.dataframeCredentials(df_UID)
+    dbServer.change_server('10.229.125.101')
+    dbServer.change_database('SolaQC')
+    dbServer.connect()
+    assert (dbServer.cnxn is not None)
+    assert (dbServer.cursor is not None)
+    dbServer.request = 'SELECT top 1 * FROM log ORDER BY [dtm_log]'
+    dbServer.executeReq()
+    dbServer.commit()
+    assert ('10.229.125.101' in dbServer.server)
+    assert (dbServer.database == 'SolaQC')
 
-
-
-#.define_Log_Cred('10.229.125.101', 'SolaQC')
-
-
+def test_c_db_withLog_executeLog():
+    df_UID = fDf_lite_Launch()
+    if df_UID is None:
+        return None
+    dbServer = db.c_db_withLog()
+    dbServer.dataframeCredentials(df_UID)
+    dbServer.define_Log_Cred(str_serverForLog = '10.229.125.101', str_databaseForLog = 'SolaQC')
+    dbServer.executeLog(str_logExec = 'SELECT top 1 * FROM log ORDER BY [dtm_log]')
+    # Check it is still Prod Server + DB after a Log
+    assert ('D1PRDSOLADB' in dbServer.server)
+    assert (dbServer.database == 'SolaDBServer')
+    assert (dbServer.uid == 'pcf_reporting')
+    dbServer.change_server('10.233.6.147')
+    dbServer.executeLog(str_logExec='SELECT top 1 * FROM log ORDER BY [dtm_log]')
+    # Check it is still Prod Server + DB after a Log
+    assert ('10.233.6.147' in dbServer.server)
+    assert (dbServer.database == 'SolaDBServer')
+    assert (dbServer.uid == 'pcf_reporting')
 
 
 

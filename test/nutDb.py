@@ -55,6 +55,7 @@ class c_db_sqlServer:
         self.__timeout = 100
         self.__request = 'Request not defined'
         self.cnxn = None
+        self.cursor = None
     def defineCredentials(self, **d_param):
         if 'server' in d_param:
             self.__server =     d_param['server']
@@ -115,21 +116,22 @@ class c_db_sqlServer:
                 self.__dict_Connect[t_keyConnect] = self.cnxn
                 # Keep in mind for the next Connexion
                 self.t_keyConnect_Current = t_keyConnect
-                return 2
+                i_cnxReturn = 2
             elif self.t_keyConnect_Current != t_keyConnect:
                 self.cnxn = self.__dict_Connect[t_keyConnect]
                 # Keep in mind for the next Connexion
                 self.t_keyConnect_Current = t_keyConnect
-                return 3
+                i_cnxReturn = 3
             elif self.__dict_Connect[t_keyConnect] == -1:
                 # raise
-                return -1
+               return -1
             else:   return 1
             # CURSOR
             self.cursor = self.cnxn.cursor()
         except Exception as err:
             self.__str__(' ERROR: Your db connexion is not working || {}'.format(err))
             raise
+        return i_cnxReturn
 
     def availablePyodbcDrivers(self):       # db_seeDriversAvailable
         self.__drivers = pyodbc.drivers()
@@ -303,16 +305,16 @@ class c_db_withLog(c_db_dfCredentials):
             self.__database_default =   self.database
             self.__uid_default =        self.uid
             self.__pwd_default =        self.pwd
-    def define_Log_Cred(self, str_serverForLog, str_databaseForLog):
+    def define_Log_Cred(self, str_serverForLog = None, str_databaseForLog = None):
         df_UID = self.df_UID
         self.__server_Log =     str_serverForLog
         self.__database_Log =   str_databaseForLog
-        self.__uid_Log =        df_UID.loc[df_UID[self.serverColName] == self.__server, self.uidColName].values[0]
-        self.__pwd_Log =        df_UID.loc[df_UID[self.serverColName] == self.__server, self.pwdColName].values[0]
-    def executeLog(self, str_logReq):
+        self.__uid_Log =        df_UID.loc[df_UID[self.serverColName] == self.__server_Log, self.uidColName].values[0]
+        self.__pwd_Log =        df_UID.loc[df_UID[self.serverColName] == self.__server_Log, self.pwdColName].values[0]
+    def executeLog(self, str_logExec = ''):
         d_pLog = dict(server=self.__server_Log, database=self.__database_Log, uid=self.__uid_Log, pwd=self.__pwd_Log)
         self.defineCredentials(**d_pLog)
-        self.request = str_logReq
+        self.request = str_logExec
         self.connect()
         self.executeReq()
         self.commit()
