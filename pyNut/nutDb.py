@@ -1,18 +1,15 @@
 try:
     from . import _lib as lib
     from . import nutFiles as fl
-    from . import nutDate as dat
     from . import nutOther as oth
 except:
     try:
         import _lib as lib
         import nutFiles as fl
-        import nutDate as dat
         import nutOther as oth
     except:
         from pyNut import _lib as lib
         from pyNut import nutFiles as fl
-        from pyNut import nutDate as dat
         from pyNut import nutOther as oth
 os = lib.os()
 pd = lib.pandas()
@@ -186,7 +183,7 @@ class c_db_sqlServer:
             # Message if empty
             if self.__bl_AlertIfEmptyReq is True:
                 if self.df_result.empty or self.df_result.dropna(how = 'all').empty:
-                    self.__str__(' EMPTY: getDataframe is empty')
+                    self.__str__(' EMPTY: getDataframe_multipleReq is empty')
         except Exception as err:
             self.__str__(' ERROR: getDataframe_multipleReq is not working || {}'.format(err))
             raise
@@ -271,8 +268,8 @@ class c_db_dfCredentials(c_db_sqlServer):
                 str_database =   df_UID.loc[df_UID[self.serverColName] == str_server, self.databaseColName].values[0]
                 str_uid =        df_UID.loc[df_UID[self.serverColName] == str_server, self.uidColName].values[0]
                 str_pwd =        df_UID.loc[df_UID[self.serverColName] == str_server, self.pwdColName].values[0]
-            except Exception as err:
-                print('ERROR in change_server: we could not find the server: |{}| in the Dataframe provided \n'.format(str_server))
+            except Exception as er:
+                print('ERROR in change_server: we could not find the server: |{}| in the Dataframe provided \n  **{}  '.format(str_server, er))
                 print(df_UID)
                 return False
             # Keep in memory the last working server
@@ -337,7 +334,16 @@ class c_db_withLog(c_db_dfCredentials):
         # Go back to the original Credentials
         d_pDefault = dict(server=self.__server_default, database=self.__database_default, uid=self.__uid_default, pwd=self.__pwd_default)
         self.defineCredentials(**d_pDefault)
-
+    def getDfLog(self, str_logExec = ''):
+        d_pLog = dict(server=self.server_Log, database=self.db_Log, uid=self.__uid_Log, pwd=self.__pwd_Log)
+        self.defineCredentials(**d_pLog)
+        self.request = str_logExec
+        self.connect()
+        self.getDataframe()
+        self.commit()
+        # Go back to the original Credentials
+        d_pDefault = dict(server=self.__server_default, database=self.__database_default, uid=self.__uid_default, pwd=self.__pwd_default)
+        self.defineCredentials(**d_pDefault)
 
 
 
@@ -372,9 +378,13 @@ def db_EXEC(str_req, df_UID = None, t_logId = None):
 def db_SelectReq(str_req, df_UID=None, t_logId=None, bl_AlertIfEmptyReq = True):
     dbServer = c_db_withLog()
     db_DefineConnectCursor(str_req, df_UID, t_logId)
-    dbServer.defineCredentials(bl_AlertIfEmptyReq = bl_AlertIfEmptyReq)
-    dbServer.getDataframe()
-    dbServer.commit()
+    dbServer.defineCredentials(bl_AlertIfEmptyReq=bl_AlertIfEmptyReq)
+    if '{}.'.format(dbServer.db_Log).lower() in str_req.lower():
+        print('  (**) Database will be {} for this request: \n   **{}**'.format(dbServer.db_Log, str_req))
+        dbServer.getDfLog(str_req)
+    else:
+        dbServer.getDataframe()
+        dbServer.commit()
     return dbServer.df_result
 
 def db_MultipleReq(str_req, df_UID=None, t_logId=None):

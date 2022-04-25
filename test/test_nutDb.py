@@ -403,3 +403,14 @@ def test_db_EXEC_dbLogInRequest():
     assert (dbServer.cnxn is not None)
     assert (isinstance(dbServer.df_result, pd.DataFrame))
 
+def test_getDfLog():
+    LaunchData()
+    dbServer = db.c_db_withLog()
+    db.db_SelectReq('SELECT top 10 * FROM tblCountry')
+    assert ('D1PRDSOLADB' in dbServer.server)
+    str_req = r"SELECT str_product FROM SolaQC..tbl_inactiveProduct WHERE str_listType = 'Restricted Stocks' AND str_perimeter = 'UK_Harvest_CSI300' AND bl_inactive = 1"
+    df_sql = db.db_SelectReq(str_req, bl_AlertIfEmptyReq=True)
+    assert (isinstance(df_sql, pd.DataFrame))
+    assert ('D1PRDSOLADB' in dbServer.server)
+    assert (dbServer.database == 'SolaDBServer')
+
