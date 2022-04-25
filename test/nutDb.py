@@ -102,6 +102,7 @@ class c_db_sqlServer:
         return str_msg
 
     def connect(self):                  # db_sqlConnectCursor
+        i_cnxReturn = 0
         t_keyConnect = (self.__server, self.__database, self.__uid)
         try:
             if t_keyConnect not in self.__dict_Connect:
@@ -124,12 +125,15 @@ class c_db_sqlServer:
                 i_cnxReturn = 3
             elif self.__dict_Connect[t_keyConnect] == -1:
                 # raise
-               return -1
-            else:   return 1
+                i_cnxReturn = -1
+                return i_cnxReturn
+            else:
+                i_cnxReturn = 1
+                return i_cnxReturn
             # CURSOR
             self.cursor = self.cnxn.cursor()
         except Exception as err:
-            self.__str__(' ERROR: Your db connexion is not working || {}'.format(err))
+            self.__str__(' ERROR: Your db connexion is not working || {} || {}'.format(err, str(i_cnxReturn)))
             raise
         return i_cnxReturn
 
@@ -199,12 +203,17 @@ class c_db_sqlServer:
 
     def closeConnection(self):
         try:
+            self.__dict_Connect = {}
+            self.__str__(' INFO: Your db connexion is closing !')
+        except: pass
+        try:
             self.cursor.close()
             del self.cursor
         except: pass
         try:    self.cnxn.close()
         except: pass
-        self.cnxn = None
+        try:    self.cnxn = None
+        except: pass
     def __del__(self):
         self.closeConnection()
 
@@ -329,37 +338,42 @@ class c_db_withLog(c_db_dfCredentials):
 #----- Function to launch the Class ----------------------------
 #---------------------------------------------------------------
 def db_defineInstance():
-    inst_db = c_db_sqlServer()
-    return inst_db
+    dbServer = c_db_withLog()
+    return dbServer
 
-def db_DefineConnectCursor(str_req, **d_credentials):
-    db_sqlServer = c_db_sqlServer()
-    db_sqlServer.defineCredentials(**d_credentials)
-    db_sqlServer.request = str_req
-    db_sqlServer.connect()
+def db_DefineConnectCursor(str_req, df_UID=None, t_logId=None):
+    dbServer = c_db_withLog()
+    if not df_UID is None:
+        dbServer.dataframeCredentials(df_UID)
+    if not t_logId is None:
+        dbServer.define_Log_Cred(str_serverForLog=t_logId(0), str_databaseForLog=t_logId(1))
+    dbServer.request = str_req
+    dbServer.connect()
     return True
 
-def db_EXEC(str_req, **d_credentials):
-    db_sqlServer = c_db_sqlServer()
-    db_DefineConnectCursor(str_req, **d_credentials)
-    db_sqlServer.executeReq()
-    db_sqlServer.commit()
+def db_EXEC(str_req, df_UID = None, t_logId = None):
+    dbServer = c_db_withLog()
+    db_DefineConnectCursor(str_req, df_UID, t_logId)
+    dbServer.executeReq()
+    dbServer.commit()
     return True
 
-def db_SelectReq(str_req, **d_credentials):
-    db_sqlServer = c_db_sqlServer()
-    db_DefineConnectCursor(str_req, **d_credentials)
-    db_sqlServer.getDataframe()
-    db_sqlServer.db_Commit()
-    return db_sqlServer.df_result
+def db_SelectReq(str_req, df_UID=None, t_logId=None):
+    dbServer = c_db_withLog()
+    db_DefineConnectCursor(str_req, df_UID, t_logId)
+    dbServer.getDataframe()
+    dbServer.commit()
+    return dbServer.df_result
 
-def db_MultipleReq(str_req, **d_credentials):
-    db_sqlServer = c_db_sqlServer()
-    db_DefineConnectCursor(str_req, **d_credentials)
-    db_sqlServer.executeReq()
-    db_sqlServer.getDataframe_multipleReq()
-    db_sqlServer.db_Commit()
-    return db_sqlServer.df_result
+def db_MultipleReq(str_req, df_UID=None, t_logId=None):
+    dbServer = c_db_withLog()
+    db_DefineConnectCursor(str_req, df_UID, t_logId)
+    dbServer.executeReq()
+    dbServer.getDataframe_multipleReq()
+    dbServer.db_Commit()
+    return dbServer.df_result
+
+
 
 
 #-------------------------------------------------------------------------------------------------------------

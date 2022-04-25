@@ -222,7 +222,6 @@ def test_c_db_dataframeCred_connect():
     dbServer.closeConnection()
     assert (dbServer.cnxn is None)
 
-
 def test_c_db_withLog_connect():
     df_UID = fDf_lite_Launch()
     if df_UID is None:
@@ -330,7 +329,59 @@ def test_c_db_withLog_executeLog():
     # Check it is still Prod Server + DB after a Log
     assert ('10.233.6.147' in dbServer.server)
     assert (dbServer.database == 'SolaDBServer')
-    assert (dbServer.uid == 'pcf_reporting')
+    assert (dbServer.uid == 'pcfReporting')
 
+
+
+#=============================================================================
+# FUNCTIONAL TEST on Launching function
+#=============================================================================
+def LaunchData():
+    dbServer =  db.c_db_withLog()
+    df_UID =    fDf_lite_Launch()
+    dbServer.dataframeCredentials(df_UID)
+    dbServer.define_Log_Cred(str_serverForLog='10.229.125.101', str_databaseForLog='SolaQC')
+    return dbServer
+
+def test_db_DefineConnectCursor():
+    LaunchData()
+    dbServer = db.c_db_withLog()
+    db.db_DefineConnectCursor('')
+    assert ('D1PRDSOLADB' in dbServer.server)
+    assert (dbServer.database == 'SolaDBServer')
+    assert (dbServer.uid == 'pcf_reporting')
+    assert (dbServer.cursor is not None)
+    assert (dbServer.cnxn is not None)
+
+def test_db_EXECLog():
+    LaunchData()
+    dbServer = db.c_db_withLog()
+    dbServer.executeLog(str_logExec='SELECT top 1 * FROM log ORDER BY [dtm_log]')
+    assert ('D1PRDSOLADB' in dbServer.server)
+    assert (dbServer.database == 'SolaDBServer')
+    assert (dbServer.uid == 'pcf_reporting')
+    assert (dbServer.cursor is not None)
+    assert (dbServer.cnxn is not None)
+
+def test_db_EXEC():
+    LaunchData()
+    dbServer = db.c_db_withLog()
+    db.db_EXEC('SELECT top 10 * FROM tblCountry')
+    assert ('D1PRDSOLADB' in dbServer.server)
+    assert (dbServer.database == 'SolaDBServer')
+    assert (dbServer.uid == 'pcf_reporting')
+    assert (dbServer.cursor is not None)
+    assert (dbServer.cnxn is not None)
+
+def test_db_SelectReq():
+    LaunchData()
+    dbServer = db.c_db_withLog()
+    db.db_SelectReq('SELECT top 10 * FROM tblCountry')
+    assert ('D1PRDSOLADB' in dbServer.server)
+    assert (dbServer.database == 'SolaDBServer')
+    assert (dbServer.uid == 'pcf_reporting')
+    assert (dbServer.cursor is not None)
+    assert (dbServer.cnxn is not None)
+    assert (isinstance(dbServer.df_result, pd.DataFrame))
 
 
