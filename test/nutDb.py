@@ -236,6 +236,7 @@ class c_db_dfCredentials(c_db_sqlServer):
     Manage the Credentials in a dataframe form"""
     def __init__(self):
         super().__init__()
+        self.df_UID = None
     def dataframeCredentials(self, df_UID):
         self.df_UID = df_UID
         # Get the columns of the UID given the order of columns are: Server, database, UID, Password
