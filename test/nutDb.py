@@ -368,9 +368,10 @@ def db_EXEC(str_req, df_UID = None, t_logId = None):
         dbServer.commit()
     return True
 
-def db_SelectReq(str_req, df_UID=None, t_logId=None):
+def db_SelectReq(str_req, df_UID=None, t_logId=None, bl_AlertIfEmptyReq = True):
     dbServer = c_db_withLog()
     db_DefineConnectCursor(str_req, df_UID, t_logId)
+    dbServer.defineCredentials(bl_AlertIfEmptyReq = bl_AlertIfEmptyReq)
     dbServer.getDataframe()
     dbServer.commit()
     return dbServer.df_result
@@ -389,7 +390,28 @@ def db_MultipleReq(str_req, df_UID=None, t_logId=None):
 #-------------------------------------------------------------------------------------------------------------
 # Read DB, Save into CSV and read CSV after that (avoid connexion to the same DB several times)
 #-------------------------------------------------------------------------------------------------------------
-def fDf_readDB_orReadCsv(str_req, str_csvName, int_dayToKeep, str_folderCsv, bl_AlertIfEmptyReq = True):
+@oth.dec_singletonsClass
+class c_FolderCsv:
+    def __init__(self):
+        self.__folder = None
+    @property
+    def folder(self):
+        return self.__folder
+    @folder.setter
+    def folder(self, str_folder=None):
+        if not str_folder is None:
+            self.__folder = str_folder
+
+def fDf_readDB_orReadCsv(str_req, str_csvName, int_dayToKeep, str_folderCsv = None, bl_AlertIfEmptyReq = True):
+    # Manage so you dont need to tell everytime the folder we are in
+    if (str_folderCsv is None) or (str_folderCsv == ''):
+        FolderCsv =     c_FolderCsv()
+        str_folderCsv = FolderCsv.folder
+    else:
+        FolderCsv =         c_FolderCsv()
+        FolderCsv.folder =  str_folderCsv
+
+    # Boolean
     bl_fileExist =  False
     bl_fileTooOld = False
 
