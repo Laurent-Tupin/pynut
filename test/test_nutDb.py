@@ -60,11 +60,11 @@ def test_c_db_sqlServer():
 def test_c_db_sqlServ_single_singleton():
     dbServer = db.c_db_sqlServ_single()
     dbServe2 = db.c_db_sqlServ_single()
-    d_param = dict(server='101', database='Test', uid='laurent', pwd='**abc**')
+    d_param = dict(server='103', database='Test', uid='laurent', pwd='**abc**')
     dbServer.defineCredentials(**d_param)
-    assert (dbServer.server == '101')
-    assert (dbServe2.server == '101')
-    d_para2 = dict(server='102', database='Prod', uid='Guillaume', pwd='**xyz**', timeout = 50, bl_AlertIfEmptyReq = False)
+    assert (dbServer.server == '103')
+    assert (dbServe2.server == '103')
+    d_para2 = dict(server='104', database='Prod', uid='Guillaume', pwd='**xyz**', timeout = 50, bl_AlertIfEmptyReq = False)
     dbServe2.defineCredentials(**d_para2)
     assert (dbServer.uid == 'Guillaume')
     assert (dbServe2.uid == 'Guillaume')
@@ -74,11 +74,11 @@ def test_c_db_sqlServ_single_singleton():
 def test_c_db_dataframeCred_singleton():
     dbServer = db.c_db_dataframeCred()
     dbServe2 = db.c_db_dataframeCred()
-    d_param = dict(server='101', database='Test', uid='laurent', pwd='**abc**')
+    d_param = dict(server='201', database='Test', uid='laurent', pwd='**abc**')
     dbServer.defineCredentials(**d_param)
-    assert (dbServer.server == '101')
-    assert (dbServe2.server == '101')
-    d_para2 = dict(server='102', database='Prod', uid='Guillaume', pwd='**xyz**', timeout = 50, bl_AlertIfEmptyReq = False)
+    assert (dbServer.server == '201')
+    assert (dbServe2.server == '201')
+    d_para2 = dict(server='202', database='Prod', uid='Guillaume', pwd='**xyz**', timeout = 50, bl_AlertIfEmptyReq = False)
     dbServe2.defineCredentials(**d_para2)
     assert (dbServer.uid == 'Guillaume')
     assert (dbServe2.uid == 'Guillaume')
@@ -88,11 +88,11 @@ def test_c_db_dataframeCred_singleton():
 def test_c_db_withLog_singleton():
     dbServer = db.c_db_withLog()
     dbServe2 = db.c_db_withLog()
-    d_param = dict(server='101', database='Test', uid='laurent', pwd='**abc**')
+    d_param = dict(server='301', database='Test', uid='laurent', pwd='**abc**')
     dbServer.defineCredentials(**d_param)
-    assert (dbServer.server == '101')
-    assert (dbServe2.server == '101')
-    d_para2 = dict(server='102', database='Prod', uid='Guillaume', pwd='**xyz**', timeout = 50, bl_AlertIfEmptyReq = False)
+    assert (dbServer.server == '301')
+    assert (dbServe2.server == '301')
+    d_para2 = dict(server='302', database='Prod', uid='Guillaume', pwd='**xyz**', timeout = 50, bl_AlertIfEmptyReq = False)
     dbServe2.defineCredentials(**d_para2)
     assert (dbServer.uid == 'Guillaume')
     assert (dbServe2.uid == 'Guillaume')
@@ -170,8 +170,8 @@ def test_c_db_withLog_change_server():
     assert (dbServer.database == 'SolaDBServer')
     assert (dbServer.uid == 'pcf_reporting')
     # right Server
-    dbServer.change_server('10.229.125.101')
-    assert ('10.229.125.101' in dbServer.server)
+    dbServer.change_server('10.228.117.59')
+    assert ('10.228.117.59' in dbServer.server)
     assert (dbServer.database == 'SolaDBServer')
     assert (dbServer.uid == 'pcfReporting')
 
@@ -337,7 +337,7 @@ def test_c_db_withLog_executeLog():
 #=============================================================================
 # FUNCTIONAL TEST on Launching function
 #=============================================================================
-def LaunchData():
+def launch_db_credentials():
     dbServer =  db.c_db_withLog()
     df_UID =    fDf_lite_Launch()
     dbServer.dataframeCredentials(df_UID)
@@ -345,7 +345,7 @@ def LaunchData():
     return dbServer
 
 def test_db_DefineConnectCursor():
-    LaunchData()
+    launch_db_credentials()
     dbServer = db.c_db_withLog()
     db.db_DefineConnectCursor('')
     assert ('D1PRDSOLADB' in dbServer.server)
@@ -355,7 +355,7 @@ def test_db_DefineConnectCursor():
     assert (dbServer.cnxn is not None)
 
 def test_db_EXECLog():
-    LaunchData()
+    launch_db_credentials()
     dbServer = db.c_db_withLog()
     dbServer.executeLog(str_logExec='SELECT top 1 * FROM log ORDER BY [dtm_log]')
     assert ('D1PRDSOLADB' in dbServer.server)
@@ -365,7 +365,7 @@ def test_db_EXECLog():
     assert (dbServer.cnxn is not None)
 
 def test_db_EXEC():
-    LaunchData()
+    launch_db_credentials()
     dbServer = db.c_db_withLog()
     db.db_EXEC('SELECT top 10 * FROM tblCountry')
     assert ('D1PRDSOLADB' in dbServer.server)
@@ -375,7 +375,7 @@ def test_db_EXEC():
     assert (dbServer.cnxn is not None)
 
 def test_db_SelectReq():
-    LaunchData()
+    launch_db_credentials()
     dbServer = db.c_db_withLog()
     db.db_SelectReq('SELECT top 10 * FROM tblCountry')
     assert ('D1PRDSOLADB' in dbServer.server)
@@ -386,7 +386,7 @@ def test_db_SelectReq():
     assert (isinstance(dbServer.df_result, pd.DataFrame))
 
 def test_db_EXEC_dbLogInRequest():
-    LaunchData()
+    launch_db_credentials()
     dbServer = db.c_db_withLog()
     db.db_SelectReq('SELECT top 10 * FROM tblCountry')
     assert ('D1PRDSOLADB' in dbServer.server)
@@ -404,7 +404,7 @@ def test_db_EXEC_dbLogInRequest():
     assert (isinstance(dbServer.df_result, pd.DataFrame))
 
 def test_getDfLog():
-    LaunchData()
+    launch_db_credentials()
     dbServer = db.c_db_withLog()
     db.db_SelectReq('SELECT top 10 * FROM tblCountry')
     assert ('D1PRDSOLADB' in dbServer.server)
@@ -413,4 +413,15 @@ def test_getDfLog():
     assert (isinstance(df_sql, pd.DataFrame))
     assert ('D1PRDSOLADB' in dbServer.server)
     assert (dbServer.database == 'SolaDBServer')
+
+def test_keepSingletonInMemory():
+    dbServer = db.c_db_withLog()
+    assert ('D1PRDSOLADB' in dbServer.server)
+    assert (isinstance(dbServer.df_UID, pd.DataFrame))
+    db.db_SelectReq("SELECT top 10 * FROM tblCountry")
+    assert (isinstance(dbServer.df_result, pd.DataFrame))
+    dbServer.executeLog(str_logExec=r"SELECT top 1 * FROM log ORDER BY [dtm_log]")
+    assert ('D1PRDSOLADB' in dbServer.server)
+    db.db_SelectReq("SELECT top 5 * FROM tblCountry")
+    assert (isinstance(dbServer.df_result, pd.DataFrame))
 

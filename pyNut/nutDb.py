@@ -51,8 +51,12 @@ class c_db_sqlServer:
         self.__bl_AlertIfEmptyReq = True
         self.__timeout = 100
         self.__request = 'Request not defined'
-        self.cnxn = None
-        self.cursor = None
+        self.cnxn =         None
+        self.cursor =       None
+        self.__server =     None
+        self.__database =   None
+        self.__uid =        None
+        self.__pwd =        None
     def defineCredentials(self, **d_param):
         if 'server' in d_param:
             self.__server =     d_param['server']
@@ -268,8 +272,8 @@ class c_db_dfCredentials(c_db_sqlServer):
                 str_database =   df_UID.loc[df_UID[self.serverColName] == str_server, self.databaseColName].values[0]
                 str_uid =        df_UID.loc[df_UID[self.serverColName] == str_server, self.uidColName].values[0]
                 str_pwd =        df_UID.loc[df_UID[self.serverColName] == str_server, self.pwdColName].values[0]
-            except Exception as er:
-                print('ERROR in change_server: we could not find the server: |{}| in the Dataframe provided \n  **{}  '.format(str_server, er))
+            except Exception as err:
+                print('ERROR in change_server: we could not find the server: |{}| in the Dataframe provided \n'.format(str_server))
                 print(df_UID)
                 return False
             # Keep in memory the last working server
@@ -380,7 +384,7 @@ def db_SelectReq(str_req, df_UID=None, t_logId=None, bl_AlertIfEmptyReq = True):
     db_DefineConnectCursor(str_req, df_UID, t_logId)
     dbServer.defineCredentials(bl_AlertIfEmptyReq=bl_AlertIfEmptyReq)
     if '{}.'.format(dbServer.db_Log).lower() in str_req.lower():
-        print('  (**) Database will be {} for this request: \n   **{}**'.format(dbServer.db_Log, str_req))
+        print('  (**) Database will be {} for this request: \n   **|{}|** \n'.format(dbServer.db_Log, str_req))
         dbServer.getDfLog(str_req)
     else:
         dbServer.getDataframe()
