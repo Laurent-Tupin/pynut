@@ -51,8 +51,6 @@ To use nutAPI / Selenium Functionnalities:
     #  Move it to Users/local/bin or C:\ProgramData\Anaconda3\Library\bin (Windows)
 
 
-    
-
 
 ## Documentation
 
@@ -140,8 +138,7 @@ Temporary documentation for nutOther :
     @oth.dec_stopProcessTimeOut(int_secondesLimit = 10, returnIfTimeOut = False)
     def function_TO_DECORATE(*args, **kwarks):
     ''' This decorators allow to stop a process if it is too long
-        For example, testing a folder existence might be very very long...
-        '''
+        For example, testing a folder existence might be very very long...'''
     
 
 Temporary documentation for nutApi :
@@ -266,13 +263,6 @@ Temporary documentation for nutDb :
     
     # OR EXEC a stored procedure    
     db.db_EXEC('EXEC Stored_Procedure')
-    
-    
-    
-    
-    
-    
-    
     
     
 Temporary documentation for nutFiles :
