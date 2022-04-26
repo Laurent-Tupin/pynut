@@ -149,7 +149,7 @@ def fBl_FolderExist(str_path):
 def fBl_FolderExist_timeout(str_path):
     """ Test if a folder exist. Giving a folder path, return a Boolean
     The function is decorated not to search for more than 10 secondes """
-    return fBl_FolderExist(fBl_FolderExist)
+    return fBl_FolderExist(str_path)
 
 def UpdateTxtFile(str_path, str_old, str_new = ''):
     with open(str_path, 'r') as file :

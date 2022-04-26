@@ -593,7 +593,7 @@ class c_Webmail_dwld(c_Webmail):
                     except: pass
                     # TODO: Look if you launch back up again the search with just SUBJECT like with OUTLOOK
                 elif str_subject != '': 
-                    print(' WARNING (exclib): We could not find the email with the subject |{}|'.format(str_subject))
+                    print('   ** WARNING (exclib): We could not find the email with the subject |{}|'.format(str_subject))
                 raise
         except Exception as err:
             print(' ERROR in getEmails_Restict: |{}|'.format(err))
