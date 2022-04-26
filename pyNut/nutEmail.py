@@ -576,7 +576,8 @@ class c_Webmail_dwld(c_Webmail):
                 except Exception as err:
                     print('  ERROR in getEmails_Restict with Time: |{}|'.format(err))
                     print('    - str_emailTime: ', str_emailTime)
-                    print('    - Bracket: ', tz_start, tz_end)
+                    try:    print('    - Bracket: ', tz_start, tz_end)
+                    except: pass
             # Filtering
             if any(d_paramFilter):          # IF NOT EMPTY
                 o_emails = o_folder.filter(**d_paramFilter)
@@ -588,7 +589,8 @@ class c_Webmail_dwld(c_Webmail):
                 if str_emailTime != '':
                     print(' WARNING: We could not find the email with the EMAIL time |{}|'.format(str_emailTime))
                     print('   ... with the subject |{}|'.format(str_subject))
-                    print('   ... Bracket: ', tz_start, tz_end)
+                    try:    print('    - Bracket: ', tz_start, tz_end)
+                    except: pass
                     # TODO: Look if you launch back up again the search with just SUBJECT like with OUTLOOK
                 elif str_subject != '': 
                     print(' WARNING (exclib): We could not find the email with the subject |{}|'.format(str_subject))

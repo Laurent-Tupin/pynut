@@ -41,7 +41,8 @@ def dec_getTimePerf(int_secondesLimitDisplay = 1):
             launchFunction = input_fct(*l_paramInput, **d_paramInput)
             # After Function Execution...
             time_Fin = time.time()
-            sec_duree = int(time_Fin - time_Debut)
+            time_duree = time_Fin - time_Debut
+            sec_duree = int(time_duree)
             milli_duree = int((time_duree - sec_duree) * 1000)
             if sec_duree >= int_secondesLimitDisplay:
                 print(' * Execution time: {} = {} sec, {} milliSec \n'.format(input_fct, sec_duree, milli_duree))
