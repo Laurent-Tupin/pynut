@@ -466,6 +466,6 @@ def fDf_readDB_orReadCsv(str_req, str_csvName, int_dayToKeep, str_folderCsv = No
 
     # ----- Save the request on CSV -----
     try:    df_return.to_csv(str_Path, index=False, header=True)
-    except: print(' Warning in db.fDf_readDB_orReadCsv: (df_return.to_csv) \n |{}| \n'.format(str_Path))
+    except: print(' Warning in db.fDf_readDB_orReadCsv: (df_return.to_csv) \n  |{}| \n'.format(str_Path))
 
     return df_return
