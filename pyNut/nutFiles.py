@@ -1212,16 +1212,14 @@ def del_fichier(str_folder, str_fileName = '', bl_ignoreErr = False):
 # ZIP
 #-----------------------------------------------------------------
 def ZipExtractFile(str_ZipPath, str_pathDest = '', str_FileName = '', bl_extractAll = False, str_zipPassword = ''):
-    """ Will read a ZIP file and extract its content in a destination folder
-    It can take password
-    It can extract all or only a file"""
     try:
+        # If the Zip has a password, better to extract all at once
+        if str_zipPassword != '':
+            bl_extractAll = True
+        # Open the ZIP
         with ZipFile(str_ZipPath, 'r') as zipObj:
             if str_zipPassword != '':
                 zipObj.setpassword(pwd = bytes(str_zipPassword, 'utf-8'))
-                # If the Zip has a password, better to extract all at once
-                bl_extractAll = True
-                # zipObj.extractall(pwd = bytes(str_zipPassword, 'utf-8'))                
             if bl_extractAll:
                 # Extract all the file
                 if str_pathDest == '':      zipObj.extractall()
@@ -1236,15 +1234,16 @@ def ZipExtractFile(str_ZipPath, str_pathDest = '', str_FileName = '', bl_extract
                 for file in l_fileInZip_file:
                     zipObj.extract(file, str_pathDest)
     except Exception as err:
-        print(' ERROR: ZipExtractFile |{}|'.format(str(err)))
+        print(' ERROR: ZipExtractFile || {}'.format(str(err)))
         if bl_extractAll:
             print(' - str_ZipPath : ', str_ZipPath)
             print(' - str_pathDest : ', str_pathDest)
+            print(' - str_zipPassword : ', str_zipPassword)
             raise
         else:
             print(' - Failed to download the file : ', str_FileName)
-            if l_fileInZip:
-                print(' - File List in the Zip : ', l_fileInZip)
+            try:    print(' - File List in the Zip : ', l_fileInZip)
+            except: print(' - No  l_fileInZip defined')
             print(' (**) Trying to extract all files...')
             ZipExtractFile(str_ZipPath, str_pathDest, '', True, str_zipPassword)
     return True
