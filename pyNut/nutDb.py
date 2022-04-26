@@ -1,16 +1,24 @@
 try:
-    from . import _lib as lib
-    from . import nutFiles as fl
-    from . import nutOther as oth
+    import _init_ as lib
+    import fct_Other as oth
+    import fct_Files as fl
 except:
-    try:
-        import _lib as lib
-        import nutFiles as fl
-        import nutOther as oth
-    except:
-        from pyNut import _lib as lib
-        from pyNut import nutFiles as fl
-        from pyNut import nutOther as oth
+    import _codeBase._init_ as lib
+    import _codeBase.fct_Other as oth
+    import _codeBase.fct_Files as fl
+# try:
+#     from . import _lib as lib
+#     from . import nutFiles as fl
+#     from . import nutOther as oth
+# except:
+#     try:
+#         import _lib as lib
+#         import nutFiles as fl
+#         import nutOther as oth
+#     except:
+#         from pyNut import _lib as lib
+#         from pyNut import nutFiles as fl
+#         from pyNut import nutOther as oth
 os = lib.os()
 pd = lib.pandas()
 pyodbc = lib.pyodbc()
@@ -358,46 +366,66 @@ def db_defineInstance():
     dbServer = c_db_withLog()
     return dbServer
 
-def db_DefineConnectCursor(str_req, df_UID=None, t_logId=None):
-    dbServer = c_db_withLog()
-    if not df_UID is None:
-        dbServer.dataframeCredentials(df_UID)
-    if not t_logId is None:
-        dbServer.define_Log_Cred(str_serverForLog=t_logId(0), str_databaseForLog=t_logId(1))
-    dbServer.request = str_req
-    dbServer.connect()
+def db_DefineConnectCursor(str_req, str_server=None, str_database=None, df_UID=None, t_logId=None):
+    try:
+        dbServer = c_db_withLog()
+        if not df_UID is None:
+            dbServer.dataframeCredentials(df_UID)
+        if not t_logId is None:
+            dbServer.define_Log_Cred(str_serverForLog=t_logId(0), str_databaseForLog=t_logId(1))
+        if not str_server is None:
+            dbServer.change_server(str_server)
+        if not str_database is None:
+            dbServer.change_database(str_database)
+        dbServer.request = str_req
+        dbServer.connect()
+    except Exception as err:
+        print('  ERROR in db_DefineConnectCursor: {}'.format(err))
+        raise
     return True
 
-def db_EXEC(str_req, df_UID = None, t_logId = None):
-    dbServer = c_db_withLog()
-    db_DefineConnectCursor(str_req, df_UID, t_logId)
-    if '{}.'.format(dbServer.db_Log).lower() in str_req.lower():
-        print('  (**) Database will be {} for this request: \n   **{}**'.format(dbServer.db_Log, str_req))
-        dbServer.executeLog(str_req)
-    else:
+def db_SelectReq(str_req, str_server=None, str_database=None, df_UID=None, t_logId=None, bl_AlertIfEmptyReq = True):
+    try:
+        dbServer = c_db_withLog()
+        db_DefineConnectCursor(str_req, str_server, str_database, df_UID, t_logId)
+        dbServer.defineCredentials(bl_AlertIfEmptyReq = bl_AlertIfEmptyReq)
+        if '{}.'.format(dbServer.db_Log).lower() in str_req.lower():
+            print('  (**) Database will be {} for this request: \n   **|{}|** \n'.format(dbServer.db_Log, str_req))
+            dbServer.getDfLog(str_req)
+        else:
+            dbServer.getDataframe()
+            dbServer.commit()
+    except Exception as err:
+        print('  ERROR in db_SelectReq: {}'.format(err))
+        raise
+    return dbServer.df_result
+
+def db_MultipleReq(str_req, str_server=None, str_database=None, df_UID=None, t_logId=None):
+    try:
+        dbServer = c_db_withLog()
+        db_DefineConnectCursor(str_req, str_server, str_database, df_UID, t_logId)
         dbServer.executeReq()
-        dbServer.commit()
+        dbServer.getDataframe_multipleReq()
+        dbServer.db_Commit()
+    except Exception as err:
+        print('  ERROR in db_MultipleReq: {}'.format(err))
+        raise
+    return dbServer.df_result
+
+def db_EXEC(str_req, str_server=None, str_database=None, df_UID = None, t_logId = None):
+    try:
+        dbServer = c_db_withLog()
+        db_DefineConnectCursor(str_req, str_server, str_database, df_UID, t_logId)
+        if '{}.'.format(dbServer.db_Log).lower() in str_req.lower():
+            print('  (**) Database will be {} for this request: \n   **{}**'.format(dbServer.db_Log, str_req))
+            dbServer.executeLog(str_req)
+        else:
+            dbServer.executeReq()
+            dbServer.commit()
+    except Exception as err:
+        print('  ERROR in db_EXEC: {}'.format(err))
+        raise
     return True
-
-def db_SelectReq(str_req, df_UID=None, t_logId=None, bl_AlertIfEmptyReq = True):
-    dbServer = c_db_withLog()
-    db_DefineConnectCursor(str_req, df_UID, t_logId)
-    dbServer.defineCredentials(bl_AlertIfEmptyReq=bl_AlertIfEmptyReq)
-    if '{}.'.format(dbServer.db_Log).lower() in str_req.lower():
-        print('  (**) Database will be {} for this request: \n   **|{}|** \n'.format(dbServer.db_Log, str_req))
-        dbServer.getDfLog(str_req)
-    else:
-        dbServer.getDataframe()
-        dbServer.commit()
-    return dbServer.df_result
-
-def db_MultipleReq(str_req, df_UID=None, t_logId=None):
-    dbServer = c_db_withLog()
-    db_DefineConnectCursor(str_req, df_UID, t_logId)
-    dbServer.executeReq()
-    dbServer.getDataframe_multipleReq()
-    dbServer.db_Commit()
-    return dbServer.df_result
 
 
 
@@ -466,6 +494,6 @@ def fDf_readDB_orReadCsv(str_req, str_csvName, int_dayToKeep, str_folderCsv = No
 
     # ----- Save the request on CSV -----
     try:    df_return.to_csv(str_Path, index=False, header=True)
-    except: print(' Warning in db.fDf_readDB_orReadCsv: (df_return.to_csv) \n  |{}| \n'.format(str_Path))
+    except: print(' Warning in db.fDf_readDB_orReadCsv: (df_return.to_csv) \n |{}| \n'.format(str_Path))
 
     return df_return

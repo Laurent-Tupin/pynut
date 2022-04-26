@@ -2229,7 +2229,7 @@ class c_win32_xlApp:
 # Copy / Paste
 #-----------------------------------------------------------------
 @oth.dec_singletonsClass
-class c_copyPaste():
+class c_copyPaste:
     def __init__(self):
         self.l_path = {}
         self.str_rootfolder = ''
