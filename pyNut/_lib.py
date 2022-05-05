@@ -1,6 +1,22 @@
 #-----------------------------------------------------------------
 # Generic Lib
 #-----------------------------------------------------------------
+def logging():
+    try:    import logging
+    except Exception as err:
+        print('  IMPORT FAIL |logging|, err:|{}|'.format(err))
+        return None
+    return logging
+
+def logger():
+    try:
+        import logging
+        logger = logging.getLogger()
+    except Exception as err:
+        print('  IMPORT FAIL |logger|, err:|{}|'.format(err))
+        return None
+    return logger
+
 def os():
     try:    import os
     except Exception as err:

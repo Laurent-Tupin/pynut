@@ -482,7 +482,7 @@ def db_MultipleReq(str_req, str_server=None, str_database=None, df_UID=None, t_l
         db_DefineConnectCursor(str_req, str_server, str_database, df_UID, t_logId)
         dbServer.executeReq()
         dbServer.getDataframe_multipleReq()
-        dbServer.db_Commit()
+        dbServer.commit()
     except Exception as err:
         print('  ERROR in db_MultipleReq: {}'.format(err))
         raise
