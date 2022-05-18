@@ -1,13 +1,19 @@
 try:
     from . import _lib as lib
-    from . import nutFiles as fl
-    from . import nutDate as dat
     from . import nutOther as oth
+    from . import nutDate as dat
+    from . import nutFiles as fl
 except:
-    import _lib as lib
-    import nutFiles as fl
-    import nutDate as dat
-    import nutOther as oth
+    try:
+        import _lib as lib
+        import nutOther as oth
+        import nutDate as dat
+        import nutFiles as fl
+    except:
+        from pyNut import _lib as lib
+        from pyNut import nutOther as oth
+        from pyNut import nutDate as dat
+        from pyNut import nutFiles as fl
 os  = lib.os()
 math =lib.math()
 pd  = lib.pandas()
