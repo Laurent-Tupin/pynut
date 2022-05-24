@@ -86,6 +86,11 @@ def fStr_BuildFolder_wRoot(str_folderPart, str_folderRoot):
         return os.path.join(str_newRoot, str_folderPart)
     else:
         return os.path.join(str_folderRoot, str_folderPart)
+def fL_getEnvironmentPythonPaths():
+    l_paths = os.environ['PATH'].split(os.pathsep)
+    return l_paths
+
+
 
 
 #------------------------------------------------------------------------------
