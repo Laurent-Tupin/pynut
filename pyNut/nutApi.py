@@ -17,6 +17,7 @@ requests    = lib.requests()
 BeautifulSoup = lib.BeautifulSoup()
 unicodedata = lib.unicodedata()
 try:
+    selenium = lib.selenium()
     selenium_webdriver = lib.selenium_webdriver()
 except:
     from selenium import webdriver as selenium_webdriver
@@ -247,6 +248,14 @@ def fDf_Launch_APIclass_timeout(str_url, d_auth = {}, d_headers = {}, l_url_keyw
     return df
 
 
+#=============================================================================
+# Other API Methods
+#=============================================================================
+def fStr_getApiKey_byPost(keyURL, user, pw):
+    req = requests.post(url = keyURL, params = {'username':user, 'password':pw})
+    key = req.text
+    return key
+
 
 
 
@@ -356,23 +365,26 @@ def fDf_htmlGetArray_Soup(str_url, bl_th = False, bl_waitForTranslation = False,
 class c_Selenium_InteractInternet:
     #----------------------------------------------------
     # To use Chrome Driver
-    #  Go to chromedriver.chromium.org
+    #  Go to chromedriver.chromium.org || https://sites.google.com/a/chromium.org/chromedriver/downloads
+    #  Chose an older version
     #  download and UnZip the folder
     #  Move it to Users/local/bin
+    #   or C:\ProgramData\Anaconda3\Library\bin (Windows)
+    #   or ...\AppData\Local\Programs\Python\Python39
     #----------------------------------------------------
     def __init__(self, str_url):
-        o_options = self.getOptions_stopMessage()
-        self.driver = selenium_webdriver.Chrome(options = o_options)
+        o_options =     self.getOptions_stopMessage()
+        self.driver =   selenium_webdriver.Chrome(options = o_options)
         self.driver.get(str_url)
         self.realButtonName = ''
         
     def getOptions_stopMessage(self):
-        options = selenium_webdriver.ChromeOptions()
+        options =       selenium_webdriver.ChromeOptions()
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
         return options
         
     def findElementByXpath(self, str_buttonxPath):
-        time.sleep(1)
+        time.sleesocp(1)
         try:    btn_click = self.driver.find_element_by_xpath(str_buttonxPath)
         except Exception as err:
             print(' INFO : Could not do the clic {}   ... Will wait 5 secondes'.format(err))
@@ -386,8 +398,8 @@ class c_Selenium_InteractInternet:
         # Spot the button Type
         # Right Click and Copy XPath, You get the XPATH
         #----------------------------------------------------
-        btn_click = self.findElementByXpath(str_buttonxPath)
-        realButtonName = str(btn_click.text)
+        btn_click =         self.findElementByXpath(str_buttonxPath)
+        realButtonName =    str(btn_click.text)
         self.realButtonName = realButtonName
         if not str_buttonName.lower() in realButtonName.lower():
             print('Link found was not |{}| but: |{}|'.format(str_buttonName,realButtonName))
@@ -401,13 +413,13 @@ class c_Selenium_InteractInternet:
         
     def fillUp(self, str_buttonxPath, str_textToFill):
         time.sleep(2)
-        fld_toFill = self.driver.find_element_by_xpath(str_buttonxPath)
+        fld_toFill =    self.driver.find_element_by_xpath(str_buttonxPath)
         fld_toFill.send_keys(str_textToFill)
     
     def changeWindow(self, int_nbWindow):
-        self.baseWindow = self.driver.window_handles[0]
-        int_nbWindow = int_nbWindow % len(self.driver.window_handles)
-        self.newWindow = self.driver.window_handles[int_nbWindow]
+        self.baseWindow =   self.driver.window_handles[0]
+        int_nbWindow =      int_nbWindow % len(self.driver.window_handles)
+        self.newWindow =    self.driver.window_handles[int_nbWindow]
         self.driver.switch_to.window(self.newWindow)
         
     def changeWindowBack(self):

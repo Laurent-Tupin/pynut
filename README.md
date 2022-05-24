@@ -44,11 +44,17 @@ This is the libraries I am using with the package
 
 To use nutAPI / Selenium Functionnalities:
 
-    $ ----------------------------------------------------
+    from pyNut import nutApi as Api
+    
+    #----------------------------------------------------
     # To use Chrome Driver
-    #  Go to chromedriver.chromium.org
+    #  Go to chromedriver.chromium.org || https://sites.google.com/a/chromium.org/chromedriver/downloads
+    #  Chose an older version (like the 92 as of August 2021)
     #  download and UnZip the folder
-    #  Move it to Users/local/bin or C:\ProgramData\Anaconda3\Library\bin (Windows)
+    #  Move it to Users/local/bin
+    #   or C:\ProgramData\Anaconda3\Library\bin (Windows)
+    #   or ...\AppData\Local\Programs\Python\Python39
+    #----------------------------------------------------
 
 
 
