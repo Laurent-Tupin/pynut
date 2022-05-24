@@ -257,6 +257,20 @@ def fStr_getApiKey_byPost(keyURL, user, pw):
     return key
 
 
+def fDf_getUrl_params(str_url, d_param):
+    try:
+        req = requests.get(url = str_url, params = d_param)
+    except Exception as err:
+        print('ERROR in fDf_getUrl_params 1: {}'.format(err))
+        print(str_url)
+        raise
+    try:
+        data =  pd.read_json(req.text)
+    except Exception as err:
+        print('ERROR in fDf_getUrl_params 2: {}'.format(err))
+        print(req)
+        raise
+    return data
 
 
 
