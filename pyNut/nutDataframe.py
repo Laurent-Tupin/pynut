@@ -511,11 +511,13 @@ def fDf_FindSubDataframe(df, str_valueToFind, str_valueToEnd = '!@#$%', int_addR
 def fStr_VlookUp(df, v_valueToFind, int_colNb = 1):
     if isinstance(v_valueToFind, str):
         try:
+            int_colNb = int(int_colNb)
             int_row = fInt_FindIndex(df, v_valueToFind, bl_resetIndex = True)
             str_return = df.iloc[int_row, int_colNb].values[0]
         except Exception as err: 
             print(' ERROR in fStr_VlookUp: Could not find the value in the file: |{}|'.format(v_valueToFind))
             print(' - ', str(err))
+            print(' -  int_row: {}'.format(str(int_row)))
             pd.set_option('display.max_rows', 1000)
             print(df, '\n\n')
             # Return None avoid error and is more logic with the LIST behavior

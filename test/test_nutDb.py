@@ -25,7 +25,7 @@ def fDf_lite_Launch():
         return None
     str_req =       "SELECT * FROM tbl_connectSolaDb"
     db_lite =       db.c_db_lite()
-    db_lite.definePath(str_pathDb)
+    db_lite.definePath( str_pathDb )
     db_lite.connect()
     df_UID =        db_lite.getDataframe(str_req)
     db_lite.closeConnection()
@@ -53,7 +53,7 @@ def test_c_db_lite_singleton():
 def test_c_db_sqlServer():
     dbServer = db.c_db_sqlServer()
     d_param = dict(server = '101', database = 'Test', uid = 'laurent', pwd = '**abc**')
-    dbServer.defineCredentials(**d_param)
+    dbServer.defineCredentials( **d_param )
     dbServer.request = "SELECT * FROM Table"
     assert (dbServer is not None)
 
@@ -341,7 +341,7 @@ def launch_db_credentials():
     dbServer =  db.c_db_withLog()
     df_UID =    fDf_lite_Launch()
     dbServer.dataframeCredentials(df_UID)
-    dbServer.define_Log_Cred(str_serverForLog='10.229.125.101', str_databaseForLog='SolaQC')
+    dbServer.define_Log_Cred(str_serverForLog = '10.229.125.101', str_databaseForLog = 'SolaQC')
     return dbServer
 
 def test_db_DefineConnectCursor():
@@ -415,6 +415,7 @@ def test_getDfLog():
     assert (dbServer.database == 'SolaDBServer')
 
 def test_keepSingletonInMemory():
+    launch_db_credentials()
     dbServer = db.c_db_withLog()
     assert ('D1PRDSOLADB' in dbServer.server)
     assert (isinstance(dbServer.df_UID, pd.DataFrame))
@@ -425,3 +426,45 @@ def test_keepSingletonInMemory():
     db.db_SelectReq("SELECT top 5 * FROM tblCountry")
     assert (isinstance(dbServer.df_result, pd.DataFrame))
 
+def test_ChangeDB_forARequest():
+    launch_db_credentials()
+    dbServer = db.c_db_withLog()
+    str_req =   r"SELECT top 1 * FROM log ORDER BY [dtm_log]"
+    df_req =    db.db_SelectReq(str_req, str_database = 'SolaQC')
+    assert (isinstance(df_req, pd.DataFrame))
+    assert ('D1PRDSOLADB' in dbServer.server)
+
+def test_ChangeDB_forARequest_details():
+    launch_db_credentials()
+    dbServer = db.c_db_withLog()
+    str_req =   r"""DECLARE @Yesterday DATE
+                DECLARE @Today DATE
+                DECLARE @ISIN VARCHAR(12)
+                
+                SET @Today = '2022-05-24 00:00:00'
+                SET @ISIN = 'HK0000172673'
+                
+                SELECT @Yesterday = MAX(tep.AsAtDate)
+                FROM SolaDBServer..vwSecurity sec
+                    inner join SolaDBServer..vwFamily f on f.SecurityID = sec.SecurityID
+                    inner join SolaDBServer..tblETFPosition tep on tep.ETFID = f.ETFID
+                WHERE tep.AsAtDate < @Today AND sec.Isin = @ISIN
+                
+                SELECT tep.AsAtDate, tep.NAV
+                FROM SolaDBServer..vwSecurity sec
+                    inner join SolaDBServer..vwFamily f on f.SecurityID = sec.SecurityID
+                    inner join SolaDBServer..tblETFPosition tep on tep.ETFID = f.ETFID
+                WHERE tep.AsAtDate = @Yesterday AND sec.Isin = @ISIN"""
+    # Details of db_SelectReq
+    db.db_DefineConnectCursor(str_req, str_database = 'SolaQC')
+    dbServer.defineCredentials(bl_AlertIfEmptyReq = True)
+    # Test
+    assert (dbServer.bl_useLog is True)
+    df_UID = dbServer.df_UID
+    uid_Log = df_UID.loc[df_UID[dbServer.serverColName] == dbServer.server_Log, 'Uid'].values[0]
+    pwd_Log = df_UID.loc[df_UID[dbServer.serverColName] == dbServer.server_Log, 'Password'].values[0]
+    d_pLog = dict(server = dbServer.server_Log, database = dbServer.db_Log, uid = uid_Log, pwd = pwd_Log)
+    assert (d_pLog['uid'] == 'pcfReporting')
+    assert (dbServer.uid == 'pcf_reporting')
+
+# pytest test/test_nutDb.py
