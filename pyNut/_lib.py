@@ -109,6 +109,13 @@ def datetime():
         return None
     return datetime
 
+def timezone():
+    try:    from datetime import timezone
+    except Exception as err:
+        print('  IMPORT FAIL |timezone|, err:|{}|'.format(err))
+        return None
+    return timezone
+
 def BDay():
     try:    from pandas.tseries.offsets import BDay
     except Exception as err:

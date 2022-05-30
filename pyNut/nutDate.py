@@ -4,6 +4,7 @@ except:
     import _lib as lib
 os          = lib.os()
 dt          = lib.datetime()
+timezone    = lib.timezone()
 pd          = lib.pandas()
 BDay        = lib.BDay()
 relativedelta = lib.relativedelta()
@@ -17,7 +18,8 @@ def fDte_Today():
     return dt.date.today()
 def fDte_Now():
     return dt.datetime.today()
-
+def fDte_Now_GMT():
+    return dt.datetime.now(timezone.utc)
 
 
 
