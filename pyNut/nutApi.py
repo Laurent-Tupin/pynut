@@ -398,7 +398,7 @@ class c_Selenium_InteractInternet:
         return options
         
     def findElementByXpath(self, str_buttonxPath):
-        time.sleesocp(1)
+        time.sleep(1)
         try:    btn_click = self.driver.find_element_by_xpath(str_buttonxPath)
         except Exception as err:
             print(' INFO : Could not do the clic {}   ... Will wait 5 secondes'.format(err))
