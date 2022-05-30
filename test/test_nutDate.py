@@ -1,17 +1,23 @@
 import datetime
 import time
-try:
-    import nutDate as dat
+try:    import nutDate as dat
 except:
     print('Online Test...')
     from pyNut import nutDate as dat
 
 #import pytest
 
+# pytest test/test_nutDate.py
+
 
 #=============================================================================
 # UNIT TEST
 #=============================================================================
+def test_fDte_Now_GMT():
+    dte_now = dat.fDte_Now()
+    dte_GMT = dat.fDte_Now_GMT()
+    assert (dte_GMT.hour+8 == dte_now.hour)
+
 def test_fDte_formatToDate():
     dte_date = '2022-02-20'
     str_format = '%Y-%m-%d'
