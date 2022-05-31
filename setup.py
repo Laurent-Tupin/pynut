@@ -24,7 +24,6 @@ setup(
     ],
     packages = find_packages(exclude = ("test",)),
     include_package_data = True,
-    install_requires = ["pandas==1.1.3", "paramiko==2.6.0", "openpyxl==3.0.5", "psutil==5.9.0",
-                        "pyodbc==4.0.32", "xlrd==1.2.0"]
+    install_requires = ["pandas==1.1.3", "openpyxl==3.0.5", "psutil==5.9.0", "pyodbc==4.0.32", "xlrd==1.2.0"]
     #entry_points={"console_scripts": ["EXEnameFile=FolderName.__main__:main"]},
 )
