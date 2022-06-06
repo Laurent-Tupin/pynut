@@ -28,6 +28,22 @@ def test_fDte_formatToDate():
     dte_date = dat.fDte_formatToDate(dte_today, str_format)
     assert( isinstance(dte_date, datetime.date) )
 
+def test_fDte_formatToDate_timestamp():
+    dte_date = '2022-06-06 20:28:15.138280'
+    str_format = '%Y-%m-%d %H:%M:%S.%f'
+    dte_datetime = dat.fDte_formatToDatetime(dte_date, str_format)
+    assert( isinstance(dte_datetime, datetime.datetime) )
+    assert( dte_datetime.hour == 20 )
+    assert( dte_datetime.minute == 28 )
+
+def tes_fDte_formatToDate_auto():
+    dte_date = '2022-06-06 20:28:15.138280'
+    str_format = '%Y-%m-%d %H:%M:%S.%f'
+    dte_datetime = dat.fDte_formatToDate_auto(dte_date)
+    assert( isinstance(dte_datetime, datetime.datetime) )
+    assert( dte_datetime.hour == 20 )
+    assert( dte_datetime.minute == 28 )
+
 def test_fInt_dateDifference():
     dte_today =     dat.fDte_Today()
     dte_yesterday = dat.fDte_AddDay(dte_today, -1)

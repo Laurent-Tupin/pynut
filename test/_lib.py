@@ -109,6 +109,13 @@ def datetime():
         return None
     return datetime
 
+def dateutil():
+    try:    import dateutil
+    except Exception as err:
+        print('  IMPORT FAIL |dateutil|, err:|{}|'.format(err))
+        return None
+    return dateutil
+
 def timezone():
     try:    from datetime import timezone
     except Exception as err:

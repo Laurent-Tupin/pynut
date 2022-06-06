@@ -9,6 +9,7 @@ timezone    = lib.timezone()
 pd          = lib.pandas()
 BDay        = lib.BDay()
 relativedelta = lib.relativedelta()
+dateutil    = lib.dateutil()
 
 
 
@@ -62,8 +63,35 @@ def fStr_DateToString(dte_date, str_dateFormat = '%Y-%m-%d'):
         raise
     return str_date
 
+def fDte_formatToDatetime(str_date, str_dateFormat = '%Y-%m-%d'):
+    """ fDte_formatToDatetime makes sure you will have a variable with a datetime format
+        The first Argument is the Variable (date in string), and the format of the string"""
+    try:
+        if type(str_date) == str:
+            dte_formatToDate = dt.datetime.strptime(str_date, str_dateFormat)
+    except Exception as err:
+        print(' ERROR in fDte_formatToDatetime')
+        print(' - Error: ', err)
+        print(' - dte_date: ', str_date, str_dateFormat, type(str_date))
+        raise
+    return dte_formatToDate
+
+def fDte_formatToDate_auto(str_date):
+    """ fDte_formatToDate_auto makes sure you will have a variable with a datetime format
+    Automatically with the python-dateutil library
+    The first Argument is the Variable (date in string)"""
+    try:
+        dte_formatToDate = dateutil.parser.parse(str_date)
+    except Exception as err:
+        print(' ERROR in fDte_formatToDatetime')
+        print(' - Error: ', err)
+        print(' - dte_date: ', str_date, type(str_date))
+        raise
+    return dte_formatToDate
+
+
 def fDte_formatToDate(dte_date, str_dateFormat = '%Y-%m-%d', bl_stopLoop = False):
-    """ fDte_formatToDate makes sure you will have a varable with a date format
+    """ fDte_formatToDate makes sure you will have a variable with a date format
     The first Argument is the Variable (date), and the format of the string if it is a sting
     It allows you to avoid testing the type of the variable and get your get Date anyhow"""
     try:
