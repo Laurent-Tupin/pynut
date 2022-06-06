@@ -44,6 +44,16 @@ def tes_fDte_formatToDate_auto():
     assert( dte_datetime.hour == 20 )
     assert( dte_datetime.minute == 28 )
 
+def test_fDte_timeStamp_to_epochTime():
+    dte_date = '2022-06-06 20:28:15.138280'
+    str_format = '%Y-%m-%d %H:%M:%S.%f'
+    dte_datetime =  dat.fDte_formatToDate_auto(dte_date)
+    epochTime =     dat.fDte_timeStamp_to_epochTime(dte_datetime)
+    print(epochTime)
+    print(type(epochTime))
+    assert (isinstance(epochTime, float))
+    assert (int(epochTime) == 1654518495 )
+
 def test_fInt_dateDifference():
     dte_today =     dat.fDte_Today()
     dte_yesterday = dat.fDte_AddDay(dte_today, -1)

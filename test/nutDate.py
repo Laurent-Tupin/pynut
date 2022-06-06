@@ -63,33 +63,6 @@ def fStr_DateToString(dte_date, str_dateFormat = '%Y-%m-%d'):
         raise
     return str_date
 
-def fDte_formatToDatetime(str_date, str_dateFormat = '%Y-%m-%d'):
-    """ fDte_formatToDatetime makes sure you will have a variable with a datetime format
-        The first Argument is the Variable (date in string), and the format of the string"""
-    try:
-        if type(str_date) == str:
-            dte_formatToDate = dt.datetime.strptime(str_date, str_dateFormat)
-    except Exception as err:
-        print(' ERROR in fDte_formatToDatetime')
-        print(' - Error: ', err)
-        print(' - dte_date: ', str_date, str_dateFormat, type(str_date))
-        raise
-    return dte_formatToDate
-
-def fDte_formatToDate_auto(str_date):
-    """ fDte_formatToDate_auto makes sure you will have a variable with a datetime format
-    Automatically with the python-dateutil library
-    The first Argument is the Variable (date in string)"""
-    try:
-        dte_formatToDate = dateutil.parser.parse(str_date)
-    except Exception as err:
-        print(' ERROR in fDte_formatToDatetime')
-        print(' - Error: ', err)
-        print(' - dte_date: ', str_date, type(str_date))
-        raise
-    return dte_formatToDate
-
-
 def fDte_formatToDate(dte_date, str_dateFormat = '%Y-%m-%d', bl_stopLoop = False):
     """ fDte_formatToDate makes sure you will have a variable with a date format
     The first Argument is the Variable (date), and the format of the string if it is a sting
@@ -126,6 +99,44 @@ def fDte_formatToTimeStamp(dte_date):
         print(' - dte_date: ', dte_date)
         raise
     return dte_formatToDate
+
+def fDte_formatToDatetime(str_date, str_dateFormat = '%Y-%m-%d'):
+    """ fDte_formatToDatetime makes sure you will have a variable with a datetime format
+        The first Argument is the Variable (date in string), and the format of the string"""
+    try:
+        if type(str_date) == str:
+            dte_formatToDate = dt.datetime.strptime(str_date, str_dateFormat)
+    except Exception as err:
+        print(' ERROR in fDte_formatToDatetime')
+        print(' - Error: ', err)
+        print(' - dte_date: ', str_date, str_dateFormat, type(str_date))
+        raise
+    return dte_formatToDate
+
+def fDte_formatToDate_auto(str_date):
+    """ fDte_formatToDate_auto makes sure you will have a variable with a datetime format
+    Automatically with the python-dateutil library
+    The first Argument is the Variable (date in string)"""
+    try:
+        dte_formatToDate = dateutil.parser.parse(str_date)
+    except Exception as err:
+        print(' ERROR in fDte_formatToDatetime')
+        print(' - Error: ', err)
+        print(' - dte_date: ', str_date, type(str_date))
+        raise
+    return dte_formatToDate
+
+def fDte_timeStamp_to_epochTime(dte_timestamp):
+    """ fDte_timeStamp_to_epochTime convert Datetime into epoch Time (integer seconds)"""
+    try:
+        try:        epochTime =     dte_timestamp.timestamp()
+        except:     epochTime =     dte_timestamp.strftime('%S')
+    except Exception as err:
+        print(' ERROR in fDte_timeStamp_to_epochTime')
+        print(' - Error: ', err)
+        print(' - dte_date: ', dte_timestamp, type(dte_timestamp))
+        raise
+    return epochTime
 
 def fDte_convertExcelInteger(int_dateEexcel, bl_formatDate_tuple = False):
     """ fDte_convertExcelInteger takes an integer as input,
