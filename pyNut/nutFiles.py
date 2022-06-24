@@ -607,11 +607,11 @@ def fDf_readExcelWithPassword(str_path, str_SheetName, str_ExcelPassword, str_ar
     # Create the CSV Name
     l_pathCSV = str_path.split('.')
     str_pathCsv = '.'.join(l_pathCSV[:-1]) + '_' + str_SheetName + '.csv'
-    print('   [:-)] Saving xls with passwor into a CSV: |{}|'.format(str_pathCsv))
     # Check if the CSV exists
     if fBl_FileExist(str_pathCsv):
         df_data = pd.read_csv(str_pathCsv, header = 0)
     else:
+        print('   [:-)] Saving xls with passwor into a CSV: |{}|'.format(str_pathCsv))
         inst_xlApp = c_win32_xlApp()
         inst_xlApp.FindXlApp(bl_visible = True)
         inst_xlApp.xlApp.DisplayAlerts = False

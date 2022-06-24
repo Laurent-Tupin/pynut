@@ -106,6 +106,8 @@ def fDte_formatToDatetime(str_date, str_dateFormat = '%Y-%m-%d'):
     try:
         if type(str_date) == str:
             dte_formatToDate = dt.datetime.strptime(str_date, str_dateFormat)
+        else:
+            dte_formatToDate = str_date
     except Exception as err:
         print(' ERROR in fDte_formatToDatetime')
         print(' - Error: ', err)
