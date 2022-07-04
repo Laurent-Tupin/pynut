@@ -1,8 +1,8 @@
 try:
     from . import _lib as lib
-    from . import nutFiles as fl
-    from . import nutDate as dat
     from . import nutOther as oth
+    from . import nutDate as dat
+    from . import nutFiles as fl
 except:
     try:
         import _lib as lib

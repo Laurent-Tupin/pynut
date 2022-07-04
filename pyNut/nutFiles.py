@@ -169,7 +169,7 @@ def TrimTxtFile(str_path, bl_right = False, bl_left = False):
     """ This function will Trim the space in a text file
     We can decide to Trim only the space on the left or right
     By default, the Trim is both side"""
-    with open(str_path, 'r') as file :
+    with open(str_path, 'r') as file:
         str_lines = file.readlines()
     # remove spaces    
     if bl_right is True:    str_lines = [line.rstrip() + '\n' for line in str_lines]
@@ -178,6 +178,44 @@ def TrimTxtFile(str_path, bl_right = False, bl_left = False):
     # Write the file out again
     with open(str_path, 'w') as file:
         file.writelines(str_lines)
+
+
+def TrimCsvFile(str_path, bl_right=False, bl_left=False):
+    """ This function will Trim the space in a CSV file
+    We can decide to Trim only the space on the left or right
+    By default, the Trim is both side"""
+    with open(str_path, 'r') as file:
+        o_reader =      csv.reader(file, delimiter=',', quoting=csv.QUOTE_NONE)
+        ll_content =    [[x for x in row] for row in o_reader]
+        # print('ll_content', ll_content)
+        ll_content2 = []
+        # Choose the L or R Trim
+        if bl_right is True:        i_sens = -1
+        elif bl_left is True:       i_sens = 1
+        else:                       i_sens = False
+        # remove spaces
+        if i_sens is False:
+            ll_content2 = [[elmt for elmt in l_line if elmt != ''] for l_line in ll_content]
+        else:
+            for l_line in ll_content:
+                for elmt in l_line[::i_sens]:
+                    if elmt != '':      break
+                    if l_line == []:    break
+                    l_line = l_line[:-1]
+                ll_content2.append(l_line)
+        # Remove the emtpy list at the end
+        for l_line in ll_content2[::-1]:
+            if l_line != []:            break
+            ll_content2 = ll_content2[:-1]
+        # print('ll_content2', ll_content2)
+
+    # Write the file out again
+    with open(str_path, 'w', newline='') as file:
+        wtr = csv.writer(file)
+        # for l_line in ll_content2:
+        wtr.writerows(ll_content2)
+
+
 
 
 #------------------------------------------------------------------------------
