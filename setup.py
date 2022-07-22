@@ -5,11 +5,13 @@ import pyNut
 # The text of the README file
 ME_PATH = pathlib.Path(__file__).parent
 README = (ME_PATH / "README.md").read_text()
+NAME = "pynut"
+VERSION = pyNut.__version__
 
 # This call to setup() does all the work
 setup(
-    name    = "pynut",
-    version = pyNut.__version__,
+    name = NAME,
+    version = VERSION,
     description = "Function easing life :)",
     long_description = README,
     long_description_content_type = "text/markdown",
@@ -24,6 +26,6 @@ setup(
     ],
     packages = find_packages(exclude = ("test",)),
     include_package_data = True,
-    install_requires = ["pandas==1.1.3", "openpyxl==3.0.5", "psutil==5.9.0", "pyodbc==4.0.32", "xlrd==1.2.0"]
+    install_requires = ["pynut-API==2.1.4", "pynut-DB==2.1.1", "pynut-Email==2.1.2", "pynut-ftp==2.1.3"]
     #entry_points={"console_scripts": ["EXEnameFile=FolderName.__main__:main"]},
 )
