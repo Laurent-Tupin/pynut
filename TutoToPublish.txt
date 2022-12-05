@@ -9,10 +9,10 @@ https://realpython.com/pypi-publish-python-package/
 python setup.py sdist bdist_wheel
 
 # Check if it passing
-twine check dist/*
+python -m twine check dist/*
 
 # UPLOAD
-twine upload dist/*
+python -m twine upload dist/*
 
 
 laurent.tupinn
