@@ -519,7 +519,7 @@ def fDf_readDB_orReadCsv(str_req, str_csvName, int_dayToKeep, str_folderCsv=None
     # ----- Get the information : is the file exist / too old -----
     if fl.fBl_FileExist(str_Path):
         bl_fileExist = True
-        if fl.fBl_fileTooOld(str_Path):
+        if fl.fBl_fileTooOld(str_Path, int_dayHisto=int_dayToKeep):
             bl_fileTooOld = True
 
     # ----- READ the FILE -----
